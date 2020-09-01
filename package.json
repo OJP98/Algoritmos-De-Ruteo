@@ -6,9 +6,12 @@
   "scripts": {
     "start": "node src/index.js",
     "flooding": "node src/flooding.js",
-    "dvr": "node src/dvr.js",
+    "dvr": "node src/Oscar/dvr.js",
     "lsr": "node src/lsr.js"
   },
   "author": "OJP98",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.0"
+  }
 }

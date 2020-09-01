@@ -125,6 +125,7 @@ class Node {
 
     if (destName === this.name) {
       console.log(`${this.name}: ${message}`);
+
     } else {
       console.log(`${this.name}==HOP==>${nextNode.path}`);
       this.edges.find(x => x.name === nextNode.path).SendMessage(srcName, destName, message);

@@ -1,4 +1,5 @@
-const Node = require('./Node');
+const Node = require('./node');
+const chalk = require('chalk');
 const NODE_LIST = [];
 
 let a = new Node('A');
@@ -50,10 +51,10 @@ NODE_LIST.forEach(node => {
   node.SendRoutingVectorToNeighbors();
 });
 
+
 NODE_LIST.forEach(node => {
-  console.log('===================')
-  console.log(node.name);
-  console.log(node.routingVector);
+  console.log(chalk.red.bgGrey(`==========| ${node.name} |==========`))
+  console.table(node.routingVector);
 });
 
 console.log('\nQUIERO MANDAR UN MENSAJE DE A -> G:\n');
