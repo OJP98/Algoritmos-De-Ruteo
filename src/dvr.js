@@ -1,23 +1,14 @@
 const Node = require('./Node');
-const readline = require('readline');
 const NODE_LIST = [];
 
 let a = new Node('A');
-
 let b = new Node('B');
-
 let c = new Node('C');
-
 let d = new Node('D');
-
 let e = new Node('E');
-
 let f = new Node('F');
-
 let g = new Node('G');
-
 let h = new Node('H');
-
 let i = new Node('I');
 
 NODE_LIST.push(a, b, c, d, e, f, g, h, i);
@@ -51,18 +42,19 @@ h.AddNeighbor(f, 4);
 i.AddNeighbor(a, 1);
 i.AddNeighbor(d, 6);
 
+
 NODE_LIST.forEach(node => {
   // Actualizar el nodo
   node.UpdateRoutingVector();
-
-  // Mandar información a vecinos
-  node.edges.forEach(dest => {
-    dest.ReceivedNewInformation(node.name, node.routingVector);
-  });
+  // Mandar mensaje a vecinos
+  node.SendRoutingVectorToNeighbors();
 });
 
 NODE_LIST.forEach(node => {
+  console.log('===================')
   console.log(node.name);
   console.log(node.routingVector);
-  console.log('===================')
 });
+
+console.log('\nQUIERO MANDAR UN MENSAJE DE A -> G:\n');
+a.SendMessage('A', 'G', 'Hello world');

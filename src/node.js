@@ -1,8 +1,12 @@
 class Node {
-  constructor(name = '-', routingVector = {}, edges = []) {
+  constructor(name = '-') {
     this.name = name;
-    this.routingVector = routingVector;
-    this.edges = edges;
+    this.routingVector = {};
+    this.routingVector[name] = {
+      cost: 0,
+      path: name
+    }
+    this.edges = [];
   }
 
   /**
@@ -21,43 +25,42 @@ class Node {
 
   /**
    * Actualiza el vector routing en base a un nuevo cálculo.
-   * @param {string} edgeName el nombre del vecino
+   * @param {string} nodeName el nombre del vecino
    * @param {number} newDist nuevo delay hacia el vecino
    * @param {string} newPath el nodo (o vecino) por el que hay que pasar para llegar
    */
-  UpdateEdge(edgeName, newDist, newPath = '') {
-    this.routingVector[edgeName] = {
+  UpdateVector(nodeName, newDist, newPath = '') {
+    this.routingVector[nodeName] = {
       cost: newDist,
       path: newPath
     }
   }
 
   /**
-   * Actualizar routing table en base a la información recibida de otro nodo
+   * Actualizar routing vectot en base a la información recibida de otro nodo
    * @param {string} srcName nombre del nodo emisor
    * @param {Object} srcRoutingVector vector de rutas del nodo emisor
    */
   ReceivedNewInformation(srcName, srcRoutingVector) {
     console.log(`${this.name} <==INFO== ${srcName}`);
-    var myRoutingVector = this.routingVector;
     var currentDist;
     var path, min, currentDist;
 
     for (var node in srcRoutingVector) {
       var nodeName = node.toString();
 
-      if (myRoutingVector[nodeName]) {
-        currentDist = myRoutingVector[srcName].cost;
+      if (this.routingVector[nodeName]) {
+        currentDist = this.routingVector[srcName].cost;
         let evalDist = srcRoutingVector[nodeName].cost;
 
-        if (evalDist + currentDist < myRoutingVector[nodeName].cost) {
-          path = srcRoutingVector[nodeName].path;
+        if (evalDist + currentDist < this.routingVector[nodeName].cost) {
+          path = srcName;
           min = evalDist + currentDist;
-          this.UpdateEdge(nodeName, min, path);
+          this.UpdateVector(nodeName, min, path);
         }
       } else {
         this.routingVector[nodeName] = {
-          cost: srcRoutingVector[nodeName].cost + myRoutingVector[srcName].cost,
+          cost: srcRoutingVector[nodeName].cost + this.routingVector[srcName].cost,
           path: srcName,
         }
       }
@@ -68,7 +71,6 @@ class Node {
    * Actualiza su tabla en base a los vecinos que tiene.
    */
   UpdateRoutingVector() {
-    const srcName = this.name;
     const srcRoutingVector = this.routingVector;
     var path, min, srcDistToDest;
 
@@ -91,24 +93,43 @@ class Node {
           if (srcDistToEdge + edgeDistToDest.cost <= srcDistToDest) {
             min = srcDistToEdge + edgeDistToDest.cost;
             path = edgeName;
-            this.UpdateEdge(destName, min, path);
+            this.UpdateVector(destName, min, path);
           } else if (destName in Object.keys(this.edges)) {
             min = srcDistToDest;
             path = destName;
-            this.UpdateEdge(destName, min, path);
+            this.UpdateVector(destName, min, path);
           }
 
         }
       });
     });
-
-    // console.log(this.routingVector);
   }
 
+  /**
+   * Envía su propia vector a sus vecinos
+   */
   SendRoutingVectorToNeighbors() {
     this.edges.forEach(edge => {
-      console.log(`${this.name} ==INFO=> ${edge.name}`);
+      edge.ReceivedNewInformation(this.name, this.routingVector);
     });
+  }
+
+  /**
+   * Envía de forma recursiva un mensaje a otro nodo
+   * @param {string} srcName nombre del que envía el mensaje
+   * @param {string} destName nombre del que recibe el mensaje
+   * @param {string} message mensaje a enviar
+   */
+  SendMessage(srcName, destName, message) {
+    const nextNode = this.routingVector[destName];
+
+    if (destName === this.name) {
+      console.log(`${this.name}: ${message}`);
+    } else {
+      console.log(`${this.name}==HOP==>${nextNode.path}`);
+      this.edges.find(x => x.name === nextNode.path).SendMessage(srcName, destName, message);
+    }
+
   }
 }
 
