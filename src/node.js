@@ -1,7 +1,7 @@
 class Node {
   constructor(name = '-', routingVector = {}, edges = []) {
     this.name = name;
-    this.routingTable = routingVector;
+    this.routingVector = routingVector;
     this.edges = edges;
   }
 
@@ -13,8 +13,7 @@ class Node {
   AddNeighbor(newNode, cost) {
     let nodeName = newNode.name;
     this.edges.push(newNode);
-    this.routingTable[nodeName] = {}
-    this.routingTable[this.name][nodeName] = {
+    this.routingVector[nodeName] = {
       cost,
       path: nodeName
     };
@@ -27,7 +26,7 @@ class Node {
    * @param {string} newPath el nodo (o vecino) por el que hay que pasar para llegar
    */
   UpdateEdge(edgeName, newDist, newPath = '') {
-    this.routingTable[this.name][edgeName] = {
+    this.routingVector[edgeName] = {
       cost: newDist,
       path: newPath
     }
@@ -36,29 +35,29 @@ class Node {
   /**
    * Actualizar routing table en base a la información recibida de otro nodo
    * @param {string} srcName nombre del nodo emisor
-   * @param {Object} srcRoutingTable vector de rutas del nodo emisor
+   * @param {Object} srcRoutingVector vector de rutas del nodo emisor
    */
-  ReceivedNewInformation(srcName, srcRoutingTable) {
+  ReceivedNewInformation(srcName, srcRoutingVector) {
     console.log(`${this.name} <==INFO== ${srcName}`);
-    var myRoutingVector = this.routingTable[this.name];
+    var myRoutingVector = this.routingVector;
     var currentDist;
     var path, min, currentDist;
 
-    for (var node in srcRoutingTable) {
+    for (var node in srcRoutingVector) {
       var nodeName = node.toString();
 
       if (myRoutingVector[nodeName]) {
         currentDist = myRoutingVector[srcName].cost;
-        let evalDist = srcRoutingTable[nodeName].cost;
+        let evalDist = srcRoutingVector[nodeName].cost;
 
         if (evalDist + currentDist < myRoutingVector[nodeName].cost) {
-          path = srcRoutingTable[nodeName].path;
+          path = srcRoutingVector[nodeName].path;
           min = evalDist + currentDist;
           this.UpdateEdge(nodeName, min, path);
         }
       } else {
-        this.routingTable[this.name][nodeName] = {
-          cost: srcRoutingTable[nodeName].cost + myRoutingVector[srcName].cost,
+        this.routingVector[nodeName] = {
+          cost: srcRoutingVector[nodeName].cost + myRoutingVector[srcName].cost,
           path: srcName,
         }
       }
@@ -70,24 +69,24 @@ class Node {
    */
   UpdateRoutingVector() {
     const srcName = this.name;
-    const srcRoutingTable = this.routingTable[srcName];
+    const srcRoutingVector = this.routingVector;
     var path, min, srcDistToDest;
 
     this.edges.forEach(edge => {
 
       const edgeName = edge.name;
-      const edgeRoutingTable = edge.routingTable;
-      const srcDistToEdge = srcRoutingTable[edgeName].cost;
+      const edgeRoutingVector = edge.routingVector;
+      const srcDistToEdge = srcRoutingVector[edgeName].cost;
 
       edge.edges.forEach(dest => {
         if (dest.name != this.name) {
           let destName = dest.name;
-          let edgeDistToDest = edgeRoutingTable[edgeName][destName];
+          let edgeDistToDest = edgeRoutingVector[destName];
 
-          if (!srcRoutingTable[destName])
+          if (!srcRoutingVector[destName])
             srcDistToDest = Infinity;
           else
-            srcDistToDest = srcRoutingTable[destName].cost;
+            srcDistToDest = srcRoutingVector[destName].cost;
 
           if (srcDistToEdge + edgeDistToDest.cost <= srcDistToDest) {
             min = srcDistToEdge + edgeDistToDest.cost;
@@ -103,7 +102,7 @@ class Node {
       });
     });
 
-    // console.log(this.routingTable[this.name]);
+    // console.log(this.routingVector);
   }
 
   SendRoutingVectorToNeighbors() {

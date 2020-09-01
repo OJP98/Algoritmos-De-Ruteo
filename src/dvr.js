@@ -2,86 +2,23 @@ const Node = require('./Node');
 const readline = require('readline');
 const NODE_LIST = [];
 
-let a = new Node('A', {
-  'A': {
-    'A': {
-      cost: 0,
-      path: 'A'
-    }
-  }
-});
+let a = new Node('A');
 
-let b = new Node('B', {
-  'B': {
-    'B': {
-      cost: 0,
-      path: 'B'
-    }
-  }
-});
+let b = new Node('B');
 
-let c = new Node('C', {
-  'C': {
-    'C': {
-      cost: 0,
-      path: 'C'
-    }
-  }
-});
+let c = new Node('C');
 
-let d = new Node('D', {
-  'D': {
-    'D': {
-      cost: 0,
-      path: 'D'
-    }
-  }
-});
+let d = new Node('D');
 
-let e = new Node('E', {
-  'E': {
-    'E': {
-      cost: 0,
-      path: 'E'
-    }
-  }
-});
+let e = new Node('E');
 
-let f = new Node('F', {
-  'F': {
-    'F': {
-      cost: 0,
-      path: 'F'
-    }
-  }
-});
+let f = new Node('F');
 
-let g = new Node('G', {
-  'G': {
-    'G': {
-      cost: 0,
-      path: 'G'
-    }
-  }
-});
+let g = new Node('G');
 
-let h = new Node('H', {
-  'H': {
-    'H': {
-      cost: 0,
-      path: 'H'
-    }
-  }
-});
+let h = new Node('H');
 
-let i = new Node('I', {
-  'I': {
-    'I': {
-      cost: 0,
-      path: 'I'
-    }
-  }
-});
+let i = new Node('I');
 
 NODE_LIST.push(a, b, c, d, e, f, g, h, i);
 
@@ -115,22 +52,17 @@ i.AddNeighbor(a, 1);
 i.AddNeighbor(d, 6);
 
 NODE_LIST.forEach(node => {
+  // Actualizar el nodo
   node.UpdateRoutingVector();
+
+  // Mandar información a vecinos
   node.edges.forEach(dest => {
-    dest.ReceivedNewInformation(node.name, node.routingTable[node.name]);
+    dest.ReceivedNewInformation(node.name, node.routingVector);
   });
 });
 
 NODE_LIST.forEach(node => {
   console.log(node.name);
-  console.log(node.routingTable[node.name]);
+  console.log(node.routingVector);
   console.log('===================')
 });
-
-// NODE_LIST.forEach(node => {
-//   console.log(`EVALUANDO: ${node.name}`);
-//   a.ReceivedNewInformation(node.name, node.routingTable[node.name]);
-// })
-// a.ReceivedNewInformation('B', b.routingTable['B']);
-// a.ReceivedNewInformation('C', c.routingTable['C']);
-// a.ReceivedNewInformation('I', i.routingTable['I']);
