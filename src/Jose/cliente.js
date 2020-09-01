@@ -1,15 +1,22 @@
 const WebSocket = require('ws');
-const LSR = require('./lsr');
-
-LinkAlgorithm = new LSR();
-
 const readline = require('readline');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
-const url = 'ws://localhost:8080';
+// ? Se define la url del servidor
+if (process.argv[2] === undefined) {
+  var url = 'ws://localhost:8080';
+} else {
+  var url = process.argv[2];
+}
 const connection = new WebSocket(url);
-let nombreNodo;
 
+//**********************************************************************************************
+//**********************************************************************************************
+//**********************************************************************************************
+
+// ? Se define el nombre del nodo
+
+let nombreNodo;
 rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
   console.log('Used es el nodo: ' + nombre);
   nombreNodo = nombre;
@@ -17,8 +24,23 @@ rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
   rl.close();
 });
 
-connection.onmessage = (e) => {
-  console.log(e.data);
+//**********************************************************************************************
+//**********************************************************************************************
+//**********************************************************************************************
+let algoritmoUsado;
+function InterpretarMensaje(mensaje) {
+  if (mensaje.option === 1) {
+    algoritmoUsado = mensaje.algoritmo;
+  }
+}
+
+//**********************************************************************************************
+//**********************************************************************************************
+//**********************************************************************************************
+// ? Metodos propios del cliente
+connection.onmessage = (mensaje) => {
+  console.log(mensaje.data);
+  InterpretarMensaje(JSON.parse(mensaje.data));
 };
 
 connection.onerror = (error) => {
