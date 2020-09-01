@@ -13,6 +13,40 @@ class LSR {
     return shortest;
   }
 
+  /*
+  Calcula cual es el siguiente nodo a visitar,
+  si es que lo hay
+  */
+  GetNextNodo(distances, nodosVisitados) {
+    const sortedDistances = Object.keys(distances).sort();
+
+    for (let index = 0; index < sortedDistances.length; index++) {
+      if (
+        distances[sortedDistances[index]] !== 'Infinity' &&
+        !nodosVisitados.includes(sortedDistances[index])
+      ) {
+        return sortedDistances[index];
+      }
+    }
+    return false;
+  }
+
+  /*
+  Imprime la tabla de distancia y nodo
+  padre
+  */
+  printTable(iterLink) {
+    console.log('Nodo \t Dist. \t padre');
+    Object.keys(iterLink['distances']).forEach((element) => {
+      if (iterLink['distances'][element] === 'Infinity') {
+        console.log(`${element} \t Inf \t ${iterLink['parents'][element]}`);
+      } else
+        console.log(
+          `${element} \t ${iterLink['distances'][element]} \t ${iterLink['parents'][element]}`
+        );
+    });
+  }
+
   findShortestPath(graph, startNode, endNode) {
     // establish object for recording distances from the start node
     let distances = {};

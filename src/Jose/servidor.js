@@ -37,40 +37,6 @@ function GetGrafoLimitada(NodoActual) {
   return retorno;
 }
 
-/*
-  Calcula cual es el siguiente nodo a visitar,
-  si es que lo hay
-*/
-function GetNextNodo(distances, nodosVisitados) {
-  const sortedDistances = Object.keys(distances).sort();
-
-  for (let index = 0; index < sortedDistances.length; index++) {
-    if (
-      distances[sortedDistances[index]] !== 'Infinity' &&
-      !nodosVisitados.includes(sortedDistances[index])
-    ) {
-      return sortedDistances[index];
-    }
-  }
-  return false;
-}
-
-/* 
-  Imprime la tabla de distancia y nodo 
-  padre
-*/
-function printTable(iterLink) {
-  console.log('Nodo \t Dist. \t padre');
-  Object.keys(iterLink['distances']).forEach((element) => {
-    if (iterLink['distances'][element] === 'Infinity') {
-      console.log(`${element} \t Inf \t ${iterLink['parents'][element]}`);
-    } else
-      console.log(
-        `${element} \t ${iterLink['distances'][element]} \t ${iterLink['parents'][element]}`
-      );
-  });
-}
-
 // Se declara el grafo
 let Grafo = [];
 
@@ -128,12 +94,12 @@ let iterLink = LinkAlgorithm.findShortestPath(
   nodoInicio,
   nodoFinal
 );
-printTable(iterLink);
+LinkAlgorithm.printTable(iterLink);
 
 // Iteraciones desconocidas
 let nextNodo;
 while (true) {
-  nextNodo = GetNextNodo(iterLink['distances'], nodosVisitados);
+  nextNodo = LinkAlgorithm.GetNextNodo(iterLink['distances'], nodosVisitados);
   if (!nextNodo) {
     console.log('Algoritmo terminado');
     break;
@@ -147,5 +113,5 @@ while (true) {
     nodoFinal
   );
   //console.log(iterLink);
-  printTable(iterLink);
+  LinkAlgorithm.printTable(iterLink);
 }
