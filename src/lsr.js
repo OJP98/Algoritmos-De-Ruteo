@@ -8,7 +8,7 @@ const shortestDistanceNode = (distances, visited) => {
       shortest = node;
     }
   }
-  console.log(`Nodo ${shortest} es el mas corto con ${distances[shortest]}`);
+  //console.log(`Nodo ${shortest} es el mas corto con ${distances[shortest]}`);
   return shortest;
 };
 
@@ -79,7 +79,7 @@ const findShortestPath = (graph, startNode, endNode) => {
 
   return results;
 };
-
+/*
 const graph = {
   A: { B: 2, C: 4, D: 10 },
   B: { A: 2, C: 1, D: 6, E: 9 },
@@ -87,7 +87,11 @@ const graph = {
   D: { C: 4, B: 6, E: 2 },
   E: { B: 9, D: 2 },
 };
+*/
 
+const graph = {
+  A: { B: 2, C: 4, D: 10 },
+};
 const shortestPath = findShortestPath(graph, 'A', 'E');
 
 console.log(shortestPath);
