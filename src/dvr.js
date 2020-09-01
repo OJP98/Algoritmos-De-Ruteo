@@ -2,57 +2,11 @@ const Node = require('./Node');
 const readline = require('readline');
 const NODE_LIST = [];
 
-// TODO: Mover esta función para que sea propia de la clase nodo
-function UpdateVectorRouting(node) {
-  const edges = node.edges;
-  const srcName = node.name;
-  const srcRoutingTable = node.routingTable[srcName];
-  var path;
-  var srcDistToDest;
-
-  edges.forEach(edge => {
-
-    const edgeName = edge.name;
-    const edgeRoutingTable = edge.routingTable;
-    const srcDistToEdge = srcRoutingTable[edgeName].cost;
-
-    edge.edges.forEach(dest => {
-      if (dest.name != node.name) {
-        let destName = dest.name;
-        let edgeDistToDest = edgeRoutingTable[edgeName][destName];
-        srcDistToDest = srcRoutingTable[destName];
-
-        if (srcDistToEdge + edgeDistToDest.cost <= srcDistToDest.cost) {
-          min = srcDistToEdge + edgeDistToDest.cost;
-          path = edgeName;
-        } else {
-          min = srcDistToDest.cost;
-          path = destName;
-        }
-
-        node.UpdateEdge(destName, min, path);
-      }
-    });
-  });
-
-  edges.forEach(edge => {
-    SendRoutingTable(srcName, edge.name, srcRoutingTable);
-  });
-
-  d.ReceivedNewInformation(srcName, srcRoutingTable);
-}
-
-// Server debería de encargarse de enviar info. a nodo especificado
-function SendRoutingTable(srcName, destName, routingTable) {
-  // TODO: Enviar la información con sockets
-  console.log(`${srcName} ==INFO==> ${destName}`);
-}
-
 let a = new Node('A', {
   'A': {
     'A': {
       cost: 0,
-      path: ''
+      path: 'A'
     }
   }
 });
@@ -61,11 +15,7 @@ let b = new Node('B', {
   'B': {
     'B': {
       cost: 0,
-      path: ''
-    },
-    'D': {
-      cost: Infinity,
-      path: ''
+      path: 'B'
     }
   }
 });
@@ -74,37 +24,113 @@ let c = new Node('C', {
   'C': {
     'C': {
       cost: 0,
-      path: ''
+      path: 'C'
     }
   }
 });
 
 let d = new Node('D', {
   'D': {
-    'B': {
-      cost: Infinity,
-      path: ''
-    },
     'D': {
       cost: 0,
-      path: ''
+      path: 'D'
     }
   }
 });
 
-NODE_LIST.push(a, b, c, d);
-a.AddNeighbor(b, 2);
-a.AddNeighbor(c, 5);
-a.AddNeighbor(d, 1);
+let e = new Node('E', {
+  'E': {
+    'E': {
+      cost: 0,
+      path: 'E'
+    }
+  }
+});
 
-b.AddNeighbor(a, 2);
-b.AddNeighbor(c, 1);
+let f = new Node('F', {
+  'F': {
+    'F': {
+      cost: 0,
+      path: 'F'
+    }
+  }
+});
 
-c.AddNeighbor(a, 5);
-c.AddNeighbor(b, 1);
-c.AddNeighbor(d, 1);
+let g = new Node('G', {
+  'G': {
+    'G': {
+      cost: 0,
+      path: 'G'
+    }
+  }
+});
 
-d.AddNeighbor(a, 1);
-d.AddNeighbor(c, 1);
+let h = new Node('H', {
+  'H': {
+    'H': {
+      cost: 0,
+      path: 'H'
+    }
+  }
+});
 
-UpdateVectorRouting(a);
+let i = new Node('I', {
+  'I': {
+    'I': {
+      cost: 0,
+      path: 'I'
+    }
+  }
+});
+
+NODE_LIST.push(a, b, c, d, e, f, g, h, i);
+
+a.AddNeighbor(b, 7);
+a.AddNeighbor(i, 1);
+a.AddNeighbor(c, 7);
+
+b.AddNeighbor(a, 7);
+b.AddNeighbor(f, 2);
+
+c.AddNeighbor(a, 7);
+c.AddNeighbor(d, 5);
+
+d.AddNeighbor(i, 6);
+d.AddNeighbor(c, 5);
+d.AddNeighbor(e, 1);
+
+e.AddNeighbor(d, 1);
+e.AddNeighbor(g, 4);
+
+f.AddNeighbor(g, 3);
+f.AddNeighbor(h, 4);
+f.AddNeighbor(b, 2);
+
+g.AddNeighbor(e, 4);
+g.AddNeighbor(f, 3);
+
+h.AddNeighbor(f, 4);
+
+i.AddNeighbor(a, 1);
+i.AddNeighbor(d, 6);
+
+NODE_LIST.forEach(node => {
+  node.UpdateRoutingVector();
+  node.edges.forEach(dest => {
+    dest.ReceivedNewInformation(node.name, node.routingTable[node.name]);
+  });
+});
+
+NODE_LIST.forEach(node => {
+  console.log(node.name);
+  console.log(node.routingTable[node.name]);
+  console.log('===================')
+});
+
+// NODE_LIST.forEach(node => {
+//   console.log(`EVALUANDO: ${node.name}`);
+//   a.ReceivedNewInformation(node.name, node.routingTable[node.name]);
+// })
+// a.ReceivedNewInformation('B', b.routingTable['B']);
+// a.ReceivedNewInformation('C', c.routingTable['C']);
+// a.ReceivedNewInformation('I', i.routingTable['I']);
