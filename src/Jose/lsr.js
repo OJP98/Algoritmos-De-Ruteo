@@ -70,10 +70,12 @@ class LSR {
     }
     shortestPath.reverse();
 
-    console.log(distances);
-    console.log(parents);
+    //console.log(distances);
+    //console.log(parents);
     // return the shortest path from start node to end node & its distance
     let results = {
+      distances: distances,
+      parents: parents,
       distance: distances[endNode],
       path: shortestPath,
     };
