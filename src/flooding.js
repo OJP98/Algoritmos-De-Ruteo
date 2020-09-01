@@ -1,25 +1,42 @@
-const sendMessage = (graph, startNode, endNode, hop_count, already_sent, message) => {
-    console.log('Estamos en el nodo ',startNode)
-    if (startNode != endNode && hop_count>0){
-        hop_count= hop_count-1;
-        already_sent.push(startNode);
-        for (let child in graph[startNode]) {
-            if (!(already_sent.includes(child))){
-                console.log('El mensaje es enviado desde ', startNode, ' hacia ', child );
-                sendMessage(graph, child, endNode, hop_count, already_sent, message)
-            }else{
-                console.log('El mensaje ya ha sido enviado desde ', child, ' hacia ', startNode)
+const sendMessage = (graph, startNode, endNode, hop_count, message, already_sent=[]) => {
+    if (endNode == startNode){
+        console.log(message);
+    }
+    else{
+        if( hop_count > 0){
+            for (let child in graph[startNode]) {
+                console.log("se envia de ",startNode," a ",child);
+                sendMessage(graph, child, endNode, hop_count-1, message, already_sent);
             }
         }
-    }else{
-        if(hop_count==0){
-            console.log("El mensaje aún no ha llegado pero se acabaron los saltos");
+        else{
+            console.log("Se acabaron los saltos")
         }
-        if(startNode==endNode){
-            console.log(message)
-        }
+        
     }
 };
+
+const sendMessageEff = (graph, startNode, endNode, hop_count, message, already_sent=[]) => {
+    if (endNode == startNode){
+        console.log(message);
+        console.log(already_sent);
+    }
+    else{
+        if(hop_count > 0){
+            for (let child in graph[startNode]) {
+                if(!(already_sent.includes(child))){
+                    console.log("de ",startNode," a ",child)
+                    already_sent.push(startNode);
+                    sendMessageEff(graph, child, endNode, hop_count-1, message, already_sent);
+                }
+            }
+        }
+        else{
+            console.log("Se acabaron los saltos")
+        }
+        
+    }
+}
   
 const graph = {
     A: { B: 7, C: 7, I: 1 },
@@ -38,7 +55,5 @@ let hop_count = 0;
 for (let child in graph) {
     hop_count=hop_count+1;
 }
-console.log(hop_count)
-already_sent = []
 message="El mensaje ha llegado";
-const shortestPath = sendMessage(graph, 'A', 'H',hop_count,already_sent, message);  
+sendMessageEff(graph, 'I', 'H',hop_count-1, message);  
