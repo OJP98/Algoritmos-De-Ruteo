@@ -8,6 +8,9 @@ D: { C: 4, B: 6, E: 2 },
 E: { B: 9, D: 2 },
 */
 
+/*
+  Convierte el grafo de objetos en JSON
+*/
 function ConvertToJSON(grafo) {
   let nuevoGrafo = {};
   grafo.forEach((nodo) => {
@@ -20,6 +23,10 @@ function ConvertToJSON(grafo) {
   return nuevoGrafo;
 }
 
+/*
+  Te da solo el grafo y las conexiones
+  respecto al NodoActual
+*/
 function GetGrafoLimitada(NodoActual) {
   let retorno;
   Grafo.forEach((element) => {
@@ -30,6 +37,10 @@ function GetGrafoLimitada(NodoActual) {
   return retorno;
 }
 
+/*
+  Calcula cual es el siguiente nodo a visitar,
+  si es que lo hay
+*/
 function GetNextNodo(distances, nodosVisitados) {
   const sortedDistances = Object.keys(distances).sort();
 
@@ -44,6 +55,23 @@ function GetNextNodo(distances, nodosVisitados) {
   return false;
 }
 
+/* 
+  Imprime la tabla de distancia y nodo 
+  padre
+*/
+function printTable(iterLink) {
+  console.log('Nodo \t Dist. \t padre');
+  Object.keys(iterLink['distances']).forEach((element) => {
+    if (iterLink['distances'][element] === 'Infinity') {
+      console.log(`${element} \t Inf \t ${iterLink['parents'][element]}`);
+    } else
+      console.log(
+        `${element} \t ${iterLink['distances'][element]} \t ${iterLink['parents'][element]}`
+      );
+  });
+}
+
+// Se declara el grafo
 let Grafo = [];
 
 let A = new Node((name = 'A'));
@@ -79,19 +107,17 @@ Grafo.push(E);
 
 LinkAlgorithm = new LSR();
 
-//console.log(Grafo);
-/*
-const GrafoJSON = ConvertToJSON(Grafo);
-
-console.log('Viene lo bueno');
-LinkAlgorithm.findShortestPath(GrafoJSON, 'A', 'E');
-*/
-
-const listaDeNodos = ['A', 'B', 'C', 'D', 'E'];
+// Se declara nodo inicial y Final
 const nodoInicio = 'A';
 const nodoFinal = 'E';
+
+/*
+  GrafoChico guarda la informacion del grafo
+  conforme lo va visitando
+*/
 let GrafoChico = [];
 
+// Iteracion inicial del algoritmo
 console.log(`Nodo Actual: ${nodoInicio}`);
 
 let nodosVisitados = [];
@@ -102,7 +128,9 @@ let iterLink = LinkAlgorithm.findShortestPath(
   nodoInicio,
   nodoFinal
 );
-console.log(iterLink);
+printTable(iterLink);
+
+// Iteraciones desconocidas
 let nextNodo;
 while (true) {
   nextNodo = GetNextNodo(iterLink['distances'], nodosVisitados);
@@ -118,5 +146,6 @@ while (true) {
     nodoInicio,
     nodoFinal
   );
-  console.log(iterLink);
+  //console.log(iterLink);
+  printTable(iterLink);
 }
