@@ -205,7 +205,8 @@ function InterpretarMensaje(mensaje, cliente) {
   } else if (mensaje.option === 5) {
     //! Enviar mensaje
     if (algoritmoUsado === 3) {
-      EnviarGrafo(mensaje);
+      console.log(mensaje);
+      EnviarMensaje(mensaje);
     }
   }
 }
