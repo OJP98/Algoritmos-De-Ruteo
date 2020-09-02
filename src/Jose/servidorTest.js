@@ -8,11 +8,11 @@ const rl = readline.createInterface(process.stdin, process.stdout);
 // ? Se define el puerto del servidor
 if (process.argv[2] === undefined) {
   var s = new server({
-    port: 4200
+    port: 4200,
   });
 } else {
   var s = new server({
-    port: process.argv[2]
+    port: process.argv[2],
   });
 }
 
@@ -145,6 +145,27 @@ function VisitarNuevoNodo(nodoAVisita, NodoInicio, NodoFin) {
     })
   );
 }
+function EnviarGrafo(mensaje) {
+  Object.keys(NodosActuales).forEach((element) => {
+    NodosActuales[element].send(
+      JSON.stringify({
+        option: 4,
+        Grafo: mensaje.Grafo,
+      })
+    );
+  });
+}
+
+function EnviarMensaje(mensaje) {
+  Object.keys(NodosActuales).forEach((element) => {
+    NodosActuales[element].send(
+      JSON.stringify({
+        option: 5,
+        mensaje: mensaje.mensaje,
+      })
+    );
+  });
+}
 
 //**********************************************************************************************
 //**********************************************************************************************
@@ -154,22 +175,38 @@ function VisitarNuevoNodo(nodoAVisita, NodoInicio, NodoFin) {
 
 function InterpretarMensaje(mensaje, cliente) {
   if (mensaje.option === 1) {
-    // nueva conexion
+    // ! nueva conexion
     NodosActuales[mensaje.nodo] = cliente;
-    cliente.send(JSON.stringify({
-      option: 1,
-      algoritmo: algoritmoUsado
-    }));
+    cliente.send(
+      JSON.stringify({
+        option: 1,
+        algoritmo: algoritmoUsado,
+      })
+    );
 
-    if (Object.keys(NodosActuales).length === 2) {
+    if (Object.keys(NodosActuales).length === 5) {
       // ! Comienza algoritmo para recorrer el grafo
       if (algoritmoUsado === 3) {
         IniciarAlgoritmo('A', 'E');
       }
     }
   } else if (mensaje.option === 3) {
-    console.log(mensaje);
-    VisitarNuevoNodo(mensaje.nextNodo, mensaje.NodoInicio, mensaje.NodoFin);
+    //! Explorar nuevo nodo
+
+    if (algoritmoUsado === 3) {
+      console.log(mensaje);
+      VisitarNuevoNodo(mensaje.nextNodo, mensaje.NodoInicio, mensaje.NodoFin);
+    }
+  } else if (mensaje.option === 4) {
+    //! Fin de algoritmo
+    if (algoritmoUsado === 3) {
+      EnviarGrafo(mensaje);
+    }
+  } else if (mensaje.option === 5) {
+    //! Enviar mensaje
+    if (algoritmoUsado === 3) {
+      EnviarGrafo(mensaje);
+    }
   }
 }
 
@@ -185,12 +222,14 @@ function InterpretarMensajeDvr(mensaje, cliente) {
     console.log(nuevoNodo);
 
     // Enviamos a cliente opcion, algoritmo y nodo correspondiente.
-    cliente.send(JSON.stringify({
-      option: 1,
-      algoritmo: algoritmoUsado,
-      nodo: nuevoNodo[0],
-      vecinos: nuevoNodo[1]
-    }));
+    cliente.send(
+      JSON.stringify({
+        option: 1,
+        algoritmo: algoritmoUsado,
+        nodo: nuevoNodo[0],
+        vecinos: nuevoNodo[1],
+      })
+    );
   }
 }
 
