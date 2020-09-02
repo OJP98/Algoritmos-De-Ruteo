@@ -6,7 +6,7 @@ const rl = readline.createInterface(process.stdin, process.stdout);
 
 // ? Se define la url del servidor
 if (process.argv[2] === undefined) {
-  var url = 'ws://localhost:8080';
+  var url = 'ws://localhost:4200';
 } else {
   var url = process.argv[2];
 }
