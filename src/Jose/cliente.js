@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const readline = require('readline');
 const LSR = require('./lsr');
+const ClienteDVR = require('../Oscar/clientedvr');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 // ? Se define la url del servidor
@@ -15,13 +16,18 @@ const connection = new WebSocket(url);
 //**********************************************************************************************
 //**********************************************************************************************
 
+var clienteDvr;
+
 // ? Se define el nombre del nodo
 
 let nombreNodo;
 rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
   console.log('Used es el nodo: ' + nombre);
   nombreNodo = nombre;
-  connection.send(JSON.stringify({ option: 1, nodo: nombreNodo }));
+  connection.send(JSON.stringify({
+    option: 1,
+    nodo: nombreNodo
+  }));
   rl.close();
 });
 //**********************************************************************************************
@@ -58,10 +64,15 @@ function IniciarAlgoritmo(mensaje) {
 //**********************************************************************************************
 //**********************************************************************************************
 let algoritmoUsado;
+
 function InterpretarMensaje(mensaje) {
   if (mensaje.option === 1) {
     // ? Conectar
     algoritmoUsado = mensaje.algoritmo;
+
+    if (algoritmoUsado === 2) {
+      clienteDvr = new ClienteDVR(mensaje.nodo);
+    }
   } else if (mensaje.option === 2) {
     // ? Iniciar algoritmo
     if (algoritmoUsado === 3) {
@@ -85,5 +96,7 @@ connection.onmessage = (mensaje) => {
 };
 
 connection.onerror = (error) => {
-  console.log(`WebSocket error: ${error}`);
+  console.log('WebSocket error\n', {
+    error
+  });
 };

@@ -99,7 +99,6 @@ class Node {
             path = destName;
             this.UpdateVector(destName, min, path);
           }
-
         }
       });
     });
@@ -120,16 +119,11 @@ class Node {
    * @param {string} destName nombre del que recibe el mensaje
    * @param {string} message mensaje a enviar
    */
-  SendMessage(srcName, destName, message) {
+  EvaluateMessage(srcName, destName, message) {
     const nextNode = this.routingVector[destName];
+    if (destName === this.name) return message;
+    else return this.edges.find(x => x.name === nextNode.path);
 
-    if (destName === this.name) {
-      console.log(`${this.name}: ${message}`);
-
-    } else {
-      console.log(`${this.name}==HOP==>${nextNode.path}`);
-      this.edges.find(x => x.name === nextNode.path).SendMessage(srcName, destName, message);
-    }
 
   }
 }

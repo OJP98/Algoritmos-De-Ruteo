@@ -57,5 +57,5 @@ NODE_LIST.forEach(node => {
   console.table(node.routingVector);
 });
 
-console.log('\nQUIERO MANDAR UN MENSAJE DE A -> G:\n');
-a.SendMessage('A', 'G', 'Hello world');
+// console.log('\nQUIERO MANDAR UN MENSAJE DE A -> G:\n');
+// a.SendMessage('A', 'G', 'Hello world');

@@ -1,13 +1,19 @@
 var server = require('ws').Server;
+const ServerDVR = require('../Oscar/serverdvr');
+const ClienteDVR = require('../Oscar/clientedvr');
 const readline = require('readline');
 const Node = require('./nodo');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 // ? Se define el puerto del servidor
 if (process.argv[2] === undefined) {
-  var s = new server({ port: 8080 });
+  var s = new server({
+    port: 8080
+  });
 } else {
-  var s = new server({ port: process.argv[2] });
+  var s = new server({
+    port: process.argv[2]
+  });
 }
 
 //**********************************************************************************************
@@ -15,6 +21,8 @@ if (process.argv[2] === undefined) {
 //**********************************************************************************************
 let algoritmoUsado;
 let Grafo = [];
+var dvr;
+var clientesDvr = {};
 // ? Se define el algoritmo a usar
 rl.question(
   'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
@@ -25,6 +33,9 @@ rl.question(
     } else if (algoritmo == 2) {
       console.log('Usando Distance vector routing...');
       algoritmoUsado = 2;
+      // dvr = new ServerDvr();
+      dvr = new ServerDVR();
+      clientesDvr = {};
     } else if (algoritmo == 3) {
       console.log('Usando Link state routing...');
       let A = new Node((name = 'A'));
@@ -145,7 +156,10 @@ function InterpretarMensaje(mensaje, cliente) {
   if (mensaje.option === 1) {
     // nueva conexion
     NodosActuales[mensaje.nodo] = cliente;
-    cliente.send(JSON.stringify({ option: 1, algoritmo: algoritmoUsado }));
+    cliente.send(JSON.stringify({
+      option: 1,
+      algoritmo: algoritmoUsado
+    }));
 
     if (Object.keys(NodosActuales).length === 2) {
       // ! Comienza algoritmo para recorrer el grafo
@@ -159,6 +173,28 @@ function InterpretarMensaje(mensaje, cliente) {
   }
 }
 
+function InterpretarMensajeDvr(mensaje, cliente) {
+  // nueva conexion
+  if (mensaje.option === 1) {
+    // dvr brinda nodo disponible
+    let nombreNodo = dvr.NewClientConnected();
+    let nuevoCliente = new ClienteDVR(nombreNodo);
+
+    // Cliente se agrega a mi diccionario de clientes.
+    clientesDvr.push({
+      key: nombreNodo,
+      value: cliente
+    });
+
+    // Enviamos a cliente opcion, algoritmo y nodo correspondiente.
+    cliente.send(JSON.stringify({
+      option: 1,
+      algoritmo: algoritmoUsado,
+      nodo: nuevoCliente.name
+    }));
+  }
+}
+
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -167,6 +203,7 @@ function InterpretarMensaje(mensaje, cliente) {
 s.on('connection', function (ws) {
   ws.on('message', function (message) {
     InterpretarMensaje(JSON.parse(message), ws);
+    // InterpretarMensajeDvr(JSON.parse(message), ws);
   });
 
   ws.on('close', function (message) {
