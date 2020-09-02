@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
 const readline = require('readline');
+const LSR = require('./lsr');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 // ? Se define la url del servidor
@@ -23,6 +24,35 @@ rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
   connection.send(JSON.stringify({ option: 1, nodo: nombreNodo }));
   rl.close();
 });
+//**********************************************************************************************
+//**********************************************************************************************
+//**********************************************************************************************
+// ? Metodos link
+const LinkAlgorithm = new LSR();
+
+function IniciarAlgoritmo(mensaje) {
+  console.log(mensaje);
+
+  let iterLink = LinkAlgorithm.findShortestPath(
+    mensaje.GrafoLImitado,
+    mensaje.NodoInicio,
+    mensaje.NodoFin
+  );
+  LinkAlgorithm.printTable(iterLink);
+  const nextNodo = LinkAlgorithm.GetNextNodo(
+    iterLink['distances'],
+    mensaje.nodosVisitados
+  );
+  console.log(nextNodo);
+  connection.send(
+    JSON.stringify({
+      option: 3,
+      nextNodo,
+      NodoInicio: mensaje.NodoInicio,
+      NodoFin: mensaje.NodoFin,
+    })
+  );
+}
 
 //**********************************************************************************************
 //**********************************************************************************************
@@ -34,7 +64,14 @@ function InterpretarMensaje(mensaje) {
     algoritmoUsado = mensaje.algoritmo;
   } else if (mensaje.option === 2) {
     // ? Iniciar algoritmo
-    console.log(mensaje);
+    if (algoritmoUsado === 3) {
+      IniciarAlgoritmo(mensaje);
+    }
+  } else if (mensaje.option === 3) {
+    // ? Explorar nuevo nodo
+    if (algoritmoUsado === 3) {
+      console.log(mensaje);
+    }
   }
 }
 

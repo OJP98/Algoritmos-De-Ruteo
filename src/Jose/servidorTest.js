@@ -71,10 +71,28 @@ rl.question(
 //**********************************************************************************************
 
 let NodosActuales = {};
+let nodosVisitados = [];
+let GrafoChico = [];
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
 // ? Metodos Link
+
+/*
+  Convierte el grafo de objetos en JSON
+*/
+function ConvertToJSON(grafo) {
+  let nuevoGrafo = {};
+  grafo.forEach((nodo) => {
+    nuevoGrafo[nodo.name] = {};
+    nodo.neighbors.forEach((neighbor) => {
+      nuevoGrafo[nodo.name][neighbor.name] = neighbor.cost;
+    });
+  });
+  //console.log(nuevoGrafo);
+  return nuevoGrafo;
+}
+
 /*
   Te da solo el grafo y las conexiones
   respecto al NodoActual
@@ -90,12 +108,29 @@ function GetGrafoLimitada(NodoActual) {
 }
 
 function IniciarAlgoritmo(NodoInicio, NodoFin) {
+  GrafoChico.push(GetGrafoLimitada(NodoInicio));
+  nodosVisitados.push(NodoInicio);
   NodosActuales[NodoInicio].send(
     JSON.stringify({
       option: 2,
       NodoInicio,
       NodoFin,
-      GrafoLImitado: GetGrafoLimitada(NodoInicio),
+      GrafoLImitado: ConvertToJSON(GrafoChico),
+      nodosVisitados,
+    })
+  );
+}
+
+function VisitarNuevoNodo(nodoAVisita, NodoInicio, NodoFin) {
+  GrafoChico.push(GetGrafoLimitada(nodoAVisita));
+  nodosVisitados.push(nodoAVisita);
+  NodosActuales[nodoAVisita].send(
+    JSON.stringify({
+      option: 3,
+      NodoInicio,
+      NodoFin,
+      GrafoLImitado: ConvertToJSON(GrafoChico),
+      nodosVisitados,
     })
   );
 }
@@ -112,12 +147,15 @@ function InterpretarMensaje(mensaje, cliente) {
     NodosActuales[mensaje.nodo] = cliente;
     cliente.send(JSON.stringify({ option: 1, algoritmo: algoritmoUsado }));
 
-    if (Object.keys(NodosActuales).length === 1) {
+    if (Object.keys(NodosActuales).length === 2) {
       // ! Comienza algoritmo para recorrer el grafo
       if (algoritmoUsado === 3) {
         IniciarAlgoritmo('A', 'E');
       }
     }
+  } else if (mensaje.option === 3) {
+    console.log(mensaje);
+    VisitarNuevoNodo(mensaje.nextNodo, mensaje.NodoInicio, mensaje.NodoFin);
   }
 }
 
