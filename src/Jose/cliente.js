@@ -30,7 +30,11 @@ rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
 let algoritmoUsado;
 function InterpretarMensaje(mensaje) {
   if (mensaje.option === 1) {
+    // ? Conectar
     algoritmoUsado = mensaje.algoritmo;
+  } else if (mensaje.option === 2) {
+    // ? Iniciar algoritmo
+    console.log(mensaje);
   }
 }
 
