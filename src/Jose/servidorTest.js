@@ -8,7 +8,7 @@ const rl = readline.createInterface(process.stdin, process.stdout);
 // ? Se define el puerto del servidor
 if (process.argv[2] === undefined) {
   var s = new server({
-    port: 8080
+    port: 4200
   });
 } else {
   var s = new server({
@@ -21,7 +21,7 @@ if (process.argv[2] === undefined) {
 //**********************************************************************************************
 let algoritmoUsado;
 let Grafo = [];
-var dvr;
+var dvr = new ServerDVR();
 var clientesDvr = {};
 // ? Se define el algoritmo a usar
 rl.question(
@@ -177,20 +177,19 @@ function InterpretarMensajeDvr(mensaje, cliente) {
   // nueva conexion
   if (mensaje.option === 1) {
     // dvr brinda nodo disponible
-    let nombreNodo = dvr.NewClientConnected();
-    let nuevoCliente = new ClienteDVR(nombreNodo);
+    let nuevoNodo = dvr.NewClientConnected();
 
     // Cliente se agrega a mi diccionario de clientes.
-    clientesDvr.push({
-      key: nombreNodo,
-      value: cliente
-    });
+    clientesDvr[nuevoNodo[0]] = cliente;
+
+    console.log(nuevoNodo);
 
     // Enviamos a cliente opcion, algoritmo y nodo correspondiente.
     cliente.send(JSON.stringify({
       option: 1,
       algoritmo: algoritmoUsado,
-      nodo: nuevoCliente.name
+      nodo: nuevoNodo[0],
+      vecinos: nuevoNodo[1]
     }));
   }
 }

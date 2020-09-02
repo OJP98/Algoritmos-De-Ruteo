@@ -1,11 +1,8 @@
 const Node = require('./node');
 
 class ClienteDVR {
-  constructor(node) {
-    this.node = node;
-    console.log({
-      node
-    });
+  constructor(nodeName, edges) {
+    this.node = new Node(nodeName);
   }
 
   NodeAddNeighbor(newNode, cost) {
@@ -36,6 +33,12 @@ class ClienteDVR {
 
     if (message !== result) this.NodeSendMessage(srcName, destName, message);
     else console.log(`${this.node.name} RECIBE DE ${srcName}: ${result}`);
+  }
+
+  PrintNode(node) {
+    console.log({
+      node
+    });
   }
 }
 

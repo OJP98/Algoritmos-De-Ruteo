@@ -59,10 +59,14 @@ class ServerDVR {
 
   NewClientConnected() {
     let newNode = this.availableNodes.shift();
-    this.grafo.push({
-      newNode: new Node(newNode)
+    this.grafo[newNode.name] = newNode;
+
+    let edgeList = [];
+    newNode.edges.forEach(edge => {
+      edgeList.push(newNode.routingVector[edge.name]);
     });
-    return newNode;
+
+    return [newNode.name, edgeList];
   }
 }
 

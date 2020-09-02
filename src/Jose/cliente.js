@@ -71,7 +71,7 @@ function InterpretarMensaje(mensaje) {
     algoritmoUsado = mensaje.algoritmo;
 
     if (algoritmoUsado === 2) {
-      clienteDvr = new ClienteDVR(mensaje.nodo);
+      clienteDvr = new ClienteDVR(mensaje.nodo, mensaje.vecinos);
     }
   } else if (mensaje.option === 2) {
     // ? Iniciar algoritmo
