@@ -4,32 +4,32 @@ const Flooding = require('./flooding');
 let grafo= [];
 
 let A = new Node((name = 'A'));
-A.Neighbor(new Node((name = 'B'), (cost = 1)));
-A.Neighbor(new Node((name = 'C'), (cost = 2)));
+A.AddNeighbor(new Node((name = 'B'), (cost = 1)));
+A.AddNeighbor(new Node((name = 'C'), (cost = 2)));
 grafo.push(A);
 
 let B = new Node((name = 'B'));
-B.Neighbor(new Node((name = 'A'), (cost = 1)));
-B.Neighbor(new Node((name = 'E'), (cost = 4)));
-B.Neighbor(new Node((name = 'C'), (cost = 3)));
-B.Neighbor(new Node((name = 'D'), (cost = 5)));
+B.AddNeighbor(new Node((name = 'A'), (cost = 1)));
+B.AddNeighbor(new Node((name = 'E'), (cost = 4)));
+B.AddNeighbor(new Node((name = 'C'), (cost = 3)));
+B.AddNeighbor(new Node((name = 'D'), (cost = 5)));
 grafo.push(B);
 
 let C = new Node((name = 'C'));
-C.Neighbor(new Node((name = 'A'), (cost = 2)));
-C.Neighbor(new Node((name = 'B'), (cost = 3)));
-C.Neighbor(new Node((name = 'D'), (cost = 6)));
+C.AddNeighbor(new Node((name = 'A'), (cost = 2)));
+C.AddNeighbor(new Node((name = 'B'), (cost = 3)));
+C.AddNeighbor(new Node((name = 'D'), (cost = 6)));
 grafo.push(C);
 
 let D = new Node((name = 'D'));
-D.Neighbor(new Node((name = 'C'), (cost = 6)));
-D.Neighbor(new Node((name = 'B'), (cost = 5)));
-D.Neighbor(new Node((name = 'E'), (cost = 7)));
+D.AddNeighbor(new Node((name = 'C'), (cost = 6)));
+D.AddNeighbor(new Node((name = 'B'), (cost = 5)));
+D.AddNeighbor(new Node((name = 'E'), (cost = 7)));
 grafo.push(D);
 
 let E = new Node((name = 'E'));
-E.Neighbor(new Node((name = 'B'), (cost = 4)));
-E.Neighbor(new Node((name = 'D'), (cost = 7)));
+E.AddNeighbor(new Node((name = 'B'), (cost = 4)));
+E.AddNeighbor(new Node((name = 'D'), (cost = 7)));
 grafo.push(E);
 
 const graph = {

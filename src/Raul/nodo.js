@@ -6,7 +6,7 @@ class Node {
         this.cost = cost;
     }
     
-    Neighbor(newNode) {
+    AddNeighbor(newNode) {
       this.neighbors.push(newNode);
     }
 
