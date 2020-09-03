@@ -39,7 +39,15 @@ fs.createReadStream('grafo.csv')
   })
   .on('end', function () {
     // ! Se termina la lectura del CSV
+<<<<<<< Updated upstream
     console.log(GrafoCSV);
+=======
+    console.log(GrafoCSV);   
+    let vecinitos = GrafoCSV['A'];
+    for (var key in vecinitos){
+      console.log();
+    }
+>>>>>>> Stashed changes
     // ? Se define el algoritmo a usar
     rl.question(
       'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
@@ -97,15 +105,24 @@ function HabilitarMensajesFlooding(cantidad) {
 
 function UsarFlooding(mensaje) {
   let vecinitos = GrafoCSV[mensaje.NodoInicio];
+<<<<<<< Updated upstream
   for (var key in vecinitos) {
     if (key != mensaje.NodoPrevio) {
 
+=======
+  for (var key in vecinitos){
+    if (key != mensaje.NodoPrevio){
+      let distancias = parseInt(mensaje.Distancia) + parseInt(vecinitos[key]);
+>>>>>>> Stashed changes
       const objeto = {
         option: 6,
         NodoPrevio: mensaje.NodoInicio,
+        NodosUsados: mensaje.NodosUsados,
         NodoInicio: key,
         NodoFin: mensaje.NodoFin,
+        Distancia: distancias,
         mensaje: mensaje.mensaje,
+        NodoEmisor: mensaje.NodoEmisor,
         hopCount: mensaje.hopCount - 1,
       };
       NodosActuales[key].send(JSON.stringify(objeto));
