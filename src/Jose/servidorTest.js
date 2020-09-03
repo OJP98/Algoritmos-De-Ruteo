@@ -85,37 +85,8 @@ fs.createReadStream('grafo.csv')
           clientesDvr = {};
         } else if (algoritmo == 3) {
           console.log('Usando Link state routing...');
-          let A = new Node((name = 'A'));
-
-          A.AddNeighbor(new Node((name = 'B'), (cost = 2)));
-          A.AddNeighbor(new Node((name = 'C'), (cost = 4)));
-          A.AddNeighbor(new Node((name = 'D'), (cost = 10)));
-          Grafo.push(A);
-
-          let B = new Node((name = 'B'));
-          B.AddNeighbor(new Node((name = 'A'), (cost = 2)));
-          B.AddNeighbor(new Node((name = 'E'), (cost = 9)));
-          B.AddNeighbor(new Node((name = 'C'), (cost = 1)));
-          B.AddNeighbor(new Node((name = 'D'), (cost = 6)));
-          Grafo.push(B);
-
-          let C = new Node((name = 'C'));
-          C.AddNeighbor(new Node((name = 'A'), (cost = 4)));
-          C.AddNeighbor(new Node((name = 'B'), (cost = 1)));
-          C.AddNeighbor(new Node((name = 'D'), (cost = 4)));
-          Grafo.push(C);
-
-          let D = new Node((name = 'D'));
-          D.AddNeighbor(new Node((name = 'C'), (cost = 4)));
-          D.AddNeighbor(new Node((name = 'B'), (cost = 6)));
-          D.AddNeighbor(new Node((name = 'E'), (cost = 2)));
-          Grafo.push(D);
-
-          let E = new Node((name = 'E'));
-          E.AddNeighbor(new Node((name = 'B'), (cost = 9)));
-          E.AddNeighbor(new Node((name = 'D'), (cost = 2)));
-          Grafo.push(E);
-
+          //Aqui
+          ArmarObjetoGrafo(GrafoCSV);
           algoritmoUsado = 3;
         } else {
           console.log('Usando Flooding...');
@@ -211,6 +182,22 @@ function GetNeig(NodoActual) {
 //**********************************************************************************************
 // ? Metodos Link
 
+function ArmarObjetoGrafo(GrafoCSV) {
+  Object.keys(GrafoCSV).forEach((NombreNodo) => {
+    let Nodo = new Node((name = NombreNodo));
+    Object.keys(GrafoCSV[NombreNodo]).forEach((NeighborName) => {
+      Nodo.AddNeighbor(
+        new Node(
+          (name = NeighborName),
+          (cost = GrafoCSV[NombreNodo][NeighborName])
+        )
+      );
+    });
+    Grafo.push(Nodo);
+  });
+  console.log(Grafo);
+}
+
 /*
   Convierte el grafo de objetos en JSON
 */
@@ -300,13 +287,13 @@ function InterpretarMensaje(mensaje, cliente) {
       })
     );
 
-    if (Object.keys(NodosActuales).length === 5) {
+    if (Object.keys(NodosActuales).length === Object.keys(GrafoCSV).length) {
       if (algoritmoUsado === 1) {
         HabilitarMensajesFlooding();
       }
       // ! Comienza algoritmo para recorrer el grafo
       if (algoritmoUsado === 3) {
-        IniciarAlgoritmo('A', 'E');
+        IniciarAlgoritmo('A', 'H');
       }
     }
   } else if (mensaje.option === 3) {
