@@ -183,7 +183,7 @@ function ExplorarNodo(mensaje) {
 
 function GuardarGrafo(mensaje) {
   GrafoCompleto = mensaje.Grafo;
-  processFork = fork('./getInput.js');
+  processFork = fork('src/Jose/getInput.js');
   processFork.send('servidor');
 
   processFork.on('message', (message) => {
