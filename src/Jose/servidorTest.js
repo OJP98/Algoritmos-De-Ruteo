@@ -39,15 +39,7 @@ fs.createReadStream('grafo.csv')
   })
   .on('end', function () {
     // ! Se termina la lectura del CSV
-<<<<<<< Updated upstream
     console.log(GrafoCSV);
-=======
-    console.log(GrafoCSV);   
-    let vecinitos = GrafoCSV['A'];
-    for (var key in vecinitos){
-      console.log();
-    }
->>>>>>> Stashed changes
     // ? Se define el algoritmo a usar
     rl.question(
       'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
