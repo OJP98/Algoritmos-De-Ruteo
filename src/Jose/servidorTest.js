@@ -24,7 +24,7 @@ if (process.argv[2] === undefined) {
 //**********************************************************************************************
 let algoritmoUsado;
 let Grafo = [];
-var dvr = new ServerDVR();
+var dvr;
 var clientesDvr = {};
 // ? Se lee el csv con la informacion del grafo
 let GrafoCSV = {};
@@ -39,7 +39,7 @@ fs.createReadStream('grafo.csv')
   })
   .on('end', function () {
     // ! Se termina la lectura del CSV
-    console.log(GrafoCSV);   
+    console.log(GrafoCSV);
     // ? Se define el algoritmo a usar
     rl.question(
       'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
@@ -52,7 +52,7 @@ fs.createReadStream('grafo.csv')
           console.log('Usando Distance vector routing...');
           algoritmoUsado = 2;
           // dvr = new ServerDvr();
-          dvr = new ServerDVR();
+          dvr = new ServerDVR(GrafoCSV);
           clientesDvr = {};
         } else if (algoritmo == 3) {
           console.log('Usando Link state routing...');
@@ -82,8 +82,9 @@ let GrafoChico = [];
 //**********************************************************************************************
 // ? Metodos Flooding
 let Grafito = [];
+
 function HabilitarMensajesFlooding(cantidad) {
-  for (var key in GrafoCSV){
+  for (var key in GrafoCSV) {
     NodosActuales[key].send(
       JSON.stringify({
         option: 2,
@@ -96,8 +97,8 @@ function HabilitarMensajesFlooding(cantidad) {
 
 function UsarFlooding(mensaje) {
   let vecinitos = GrafoCSV[mensaje.NodoInicio];
-  for (var key in vecinitos){
-    if (key != mensaje.NodoPrevio){
+  for (var key in vecinitos) {
+    if (key != mensaje.NodoPrevio) {
 
       const objeto = {
         option: 6,
@@ -213,23 +214,84 @@ function EnviarMensaje(mensaje) {
 
 function InterpretarMensaje(mensaje, cliente) {
   if (mensaje.option === 1) {
-    // ! nueva conexion
-    NodosActuales[mensaje.nodo] = cliente;
-    cliente.send(
-      JSON.stringify({
-        option: 1,
-        algoritmo: algoritmoUsado,
-      })
-    );
 
-    if (Object.keys(NodosActuales).length === Object.keys(GrafoCSV).length) {
-      if (algoritmoUsado === 1) {
-        HabilitarMensajesFlooding(Object.keys(GrafoCSV).length);
+    if (algoritmoUsado === 2) {
+
+      if (Object.keys(clientesDvr).length >= 9) return;
+      // dvr brinda nodo disponible
+      let nuevoNodo = dvr.NewClientConnected(mensaje.nodo);
+
+      // Cliente se agrega a mi diccionario de clientes.
+      clientesDvr[nuevoNodo[0]] = cliente;
+
+      // Enviamos a cliente opcion, algoritmo y nodo correspondiente.
+      cliente.send(
+        JSON.stringify({
+          option: 1,
+          algoritmo: algoritmoUsado,
+          nodo: nuevoNodo[0],
+          vecinos: nuevoNodo[1],
+        })
+      );
+
+      // Si todos están listos, enviar opción 2
+      if (Object.keys(clientesDvr).length === 9) {
+        var counter = 0;
+
+        const interval = setInterval(function () {
+          s.clients.forEach(function each(client) {
+            if (client.readyState === CLIENT_READY) {
+              client.send(
+                JSON.stringify({
+                  option: 2,
+                })
+              );
+            }
+          });
+
+          counter += 1;
+          if (counter > 3) clearInterval(interval);
+        }, 200);
       }
-      // ! Comienza algoritmo para recorrer el grafo
-      if (algoritmoUsado === 3) {
-        IniciarAlgoritmo('A', 'H');
+    } else {
+      NodosActuales[mensaje.nodo] = cliente;
+      cliente.send(
+        JSON.stringify({
+          option: 1,
+          algoritmo: algoritmoUsado,
+        })
+      );
+
+      if (Object.keys(NodosActuales).length === Object.keys(GrafoCSV).length) {
+        if (algoritmoUsado === 1) {
+          HabilitarMensajesFlooding(Object.keys(GrafoCSV).length);
+        }
+        // ! Comienza algoritmo para recorrer el grafo
+        if (algoritmoUsado === 3) {
+          IniciarAlgoritmo('A', 'H');
+        }
       }
+    }
+    // ! nueva conexion
+
+  } else if (mensaje.option === 2) {
+    if (algoritmoUsado === 2) {
+      let destName = mensaje.destName;
+      let srcName = mensaje.srcName;
+      let routingVector = mensaje.routingVector;
+      let destClient = clientesDvr[destName];
+
+      if (destClient == null) return;
+
+      console.log(`${srcName} ==INFO=> ${destName}`);
+
+      destClient.send(
+        JSON.stringify({
+          option: 3,
+          srcName,
+          routingVector,
+        })
+      );
     }
   } else if (mensaje.option === 3) {
     //! Explorar nuevo nodo
@@ -255,67 +317,6 @@ function InterpretarMensaje(mensaje, cliente) {
   }
 }
 
-function InterpretarMensajeDvr(mensaje, cliente) {
-  // nueva conexion
-  if (mensaje.option === 1) {
-    if (Object.keys(clientesDvr).length >= 9) return;
-    // dvr brinda nodo disponible
-    let nuevoNodo = dvr.NewClientConnected();
-
-    // Cliente se agrega a mi diccionario de clientes.
-    clientesDvr[nuevoNodo[0]] = cliente;
-
-    // Enviamos a cliente opcion, algoritmo y nodo correspondiente.
-    cliente.send(
-      JSON.stringify({
-        option: 1,
-        algoritmo: algoritmoUsado,
-        nodo: nuevoNodo[0],
-        vecinos: nuevoNodo[1],
-      })
-    );
-
-    // Si todos están listos, enviar opción 2
-    if (Object.keys(clientesDvr).length === 9) {
-      var counter = 0;
-
-      const interval = setInterval(function () {
-        s.clients.forEach(function each(client) {
-          if (client.readyState === CLIENT_READY) {
-            client.send(
-              JSON.stringify({
-                option: 2,
-              })
-            );
-          }
-        });
-
-        counter += 1;
-        if (counter > 3) clearInterval(interval);
-      }, 200);
-    }
-
-    // Enviar routing vector
-  } else if (mensaje.option === 2) {
-    let destName = mensaje.destName;
-    let srcName = mensaje.srcName;
-    let routingVector = mensaje.routingVector;
-    let destClient = clientesDvr[destName];
-
-    if (destClient == null) return;
-
-    console.log(`${srcName} ==INFO=> ${destName}`);
-
-    destClient.send(
-      JSON.stringify({
-        option: 3,
-        srcName,
-        routingVector,
-      })
-    );
-  }
-}
-
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -324,7 +325,6 @@ function InterpretarMensajeDvr(mensaje, cliente) {
 s.on('connection', function (ws) {
   ws.on('message', function (message) {
     InterpretarMensaje(JSON.parse(message), ws);
-    // InterpretarMensajeDvr(JSON.parse(message), ws);
   });
 
   ws.on('close', function (message) {
