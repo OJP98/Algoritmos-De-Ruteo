@@ -1,11 +1,13 @@
 const { fork } = require('child_process');
 
-const process = fork('./send_mail.js');
+const processFork = fork('./getInput.js');
 
-process.send('servidor');
+processFork.send('servidor');
 
-process.on('message', (message) => {
-  console.log(`Number of mails sent ${message.counter}`);
+processFork.on('message', (message) => {
+  if (message.option === 0) process.exit();
+  console.log(`Destino ${message.destino}`);
+  console.log(`Mensaje ${message.mensaje}`);
 });
 
 function function1() {
