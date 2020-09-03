@@ -189,7 +189,7 @@ function ArmarObjetoGrafo(GrafoCSV) {
       Nodo.AddNeighbor(
         new Node(
           (name = NeighborName),
-          (cost = GrafoCSV[NombreNodo][NeighborName])
+          (cost = parseInt(GrafoCSV[NombreNodo][NeighborName]))
         )
       );
     });

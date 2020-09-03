@@ -18,16 +18,37 @@ class LSR {
   si es que lo hay
   */
   GetNextNodo(distances, nodosVisitados) {
-    const sortedDistances = Object.keys(distances).sort();
+    const sortedDistances = Object.values(distances).sort();
+    console.log('Distancias********************');
+    console.log(sortedDistances);
+    console.log();
+    console.log(nodosVisitados);
+    console.log();
+    console.log(distances);
+    console.log('Distancias********************');
 
-    for (let index = 0; index < sortedDistances.length; index++) {
-      if (
-        distances[sortedDistances[index]] !== 'Infinity' &&
-        !nodosVisitados.includes(sortedDistances[index])
-      ) {
-        return sortedDistances[index];
+    const distancesKeys = Object.keys(distances);
+
+    for (let index1 = 0; index1 < sortedDistances.length; index1++) {
+      for (let index = 0; index < distancesKeys.length; index++) {
+        if (
+          sortedDistances[index1] == distances[distancesKeys[index]] &&
+          !nodosVisitados.includes(distancesKeys[index])
+        ) {
+          return distancesKeys[index];
+        }
       }
     }
+    /*
+    for (let index = 0; index < distancesKeys.length; index++) {
+      if (
+        sortedDistances[0] == distances[distancesKeys[index]] &&
+        !nodosVisitados.includes(distancesKeys[index])
+      ) {
+        return distancesKeys[index];
+      }
+    }
+    */
     return false;
   }
 
