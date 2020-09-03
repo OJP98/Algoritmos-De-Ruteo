@@ -36,7 +36,7 @@ var clienteDvr;
 
 let nombreNodo;
 rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
-  console.log('Used es el nodo: ' + nombre);
+  console.log('Bienvenido nodo: ' + nombre);
   nombreNodo = nombre;
   connection.send(
     JSON.stringify({
@@ -57,7 +57,7 @@ let saltos;
 function EnviarMensajeFlooding(mensaje) {
   saltos = mensaje.hopCount;
   let distancias = 0;
-  processFork = fork('./getInput.js');
+  processFork = fork('/src/Jose/getInput.js');
   processFork.send('servidor');
 
   processFork.on('message', (message) => {
