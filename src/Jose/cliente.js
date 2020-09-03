@@ -42,9 +42,9 @@ let GrafoCompleto;
 //**********************************************************************************************
 //**********************************************************************************************
 // ? Metodos flooding
-
+let saltos;
 function EnviarMensajeFlooding(mensaje) {
-  console.log(mensaje.Grafo);
+  saltos=mensaje.hopCount;
   processFork = fork('./getInput.js');
   processFork.send('servidor');
 
@@ -59,7 +59,7 @@ function EnviarMensajeFlooding(mensaje) {
       NodoInicio: nombreNodo,
       NodoFin: message.destino,
       mensaje: message.mensaje,
-      hopCount: 5,
+      hopCount: saltos-1,
     };
 
     connection.send(JSON.stringify(objeto));
@@ -75,7 +75,7 @@ function ReplicarFlooding(mensaje) {
         NodoInicio: mensaje.NodoInicio,
         NodoFin: mensaje.NodoFin,
         mensaje: mensaje.mensaje,
-        hopCount: mensaje.hopCount - 1,
+        hopCount: mensaje.hopCount,
       };
       console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
       console.log('Quedan ', mensaje.hopCount, ' saltos');
@@ -92,28 +92,6 @@ function ReplicarFlooding(mensaje) {
   }
 }
 
-function LogMensaje(objeto) {
-  if (objeto.NodoFin === nombreNodo) {
-    console.log(`
-  Nodo Fuente: ${objeto.NodoInicio}
-  Nodo Destino: ${objeto.NodoFin}
-  Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
-      objeto.ruta.length
-    }
-  Distancia Total: ${objeto.distanciaTotal}
-  Mensaje: ${objeto.mensaje}
-  `);
-  } else {
-    console.log(`
-  Nodo Fuente: ${objeto.NodoInicio}
-  Nodo Destino: ${objeto.NodoFin}
-  Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
-      objeto.ruta.length
-    }
-  Distancia Total: ${objeto.distanciaTotal}
-  `);
-  }
-}
 
 //**********************************************************************************************
 //**********************************************************************************************

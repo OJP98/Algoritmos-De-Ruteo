@@ -39,43 +39,14 @@ fs.createReadStream('grafo.csv')
   })
   .on('end', function () {
     // ! Se termina la lectura del CSV
-    console.log(GrafoCSV);
+    console.log(GrafoCSV);   
     // ? Se define el algoritmo a usar
     rl.question(
       'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
       (algoritmo) => {
         if (algoritmo == 1) {
           console.log('Usando Flooding...');
-
-          let A = new Node((name = 'A'));
-          A.AddNeighbor(new Node((name = 'B'), (cost = 1)));
-          A.AddNeighbor(new Node((name = 'C'), (cost = 2)));
-          Grafo.push(A);
-
-          let B = new Node((name = 'B'));
-          B.AddNeighbor(new Node((name = 'A'), (cost = 1)));
-          B.AddNeighbor(new Node((name = 'E'), (cost = 4)));
-          B.AddNeighbor(new Node((name = 'C'), (cost = 3)));
-          B.AddNeighbor(new Node((name = 'D'), (cost = 5)));
-          Grafo.push(B);
-
-          let C = new Node((name = 'C'));
-          C.AddNeighbor(new Node((name = 'A'), (cost = 2)));
-          C.AddNeighbor(new Node((name = 'B'), (cost = 3)));
-          C.AddNeighbor(new Node((name = 'D'), (cost = 6)));
-          Grafo.push(C);
-
-          let D = new Node((name = 'D'));
-          D.AddNeighbor(new Node((name = 'C'), (cost = 6)));
-          D.AddNeighbor(new Node((name = 'B'), (cost = 5)));
-          D.AddNeighbor(new Node((name = 'E'), (cost = 7)));
-          Grafo.push(D);
-
-          let E = new Node((name = 'E'));
-          E.AddNeighbor(new Node((name = 'B'), (cost = 4)));
-          E.AddNeighbor(new Node((name = 'D'), (cost = 7)));
-          Grafo.push(E);
-
+          ArmarObjetoGrafo(GrafoCSV);
           algoritmoUsado = 1;
         } else if (algoritmo == 2) {
           console.log('Usando Distance vector routing...');
@@ -111,72 +82,36 @@ let GrafoChico = [];
 //**********************************************************************************************
 // ? Metodos Flooding
 let Grafito = [];
-function HabilitarMensajesFlooding() {
-  NodosActuales['A'].send(
-    JSON.stringify({
-      option: 2,
-      Grafo: 'ahi vamos prrrrro',
-    })
-  );
-  NodosActuales['B'].send(
-    JSON.stringify({
-      option: 2,
-      Grafo: 'ahi vamos prrrrro',
-    })
-  );
-  NodosActuales['C'].send(
-    JSON.stringify({
-      option: 2,
-      Grafo: 'ahi vamos prrrrro',
-    })
-  );
-  NodosActuales['D'].send(
-    JSON.stringify({
-      option: 2,
-      Grafo: 'ahi vamos prrrrro',
-    })
-  );
-  NodosActuales['E'].send(
-    JSON.stringify({
-      option: 2,
-      Grafo: 'ahi vamos prrrrro',
-    })
-  );
+function HabilitarMensajesFlooding(cantidad) {
+  for (var key in GrafoCSV){
+    NodosActuales[key].send(
+      JSON.stringify({
+        option: 2,
+        hopCount: cantidad,
+        Grafo: 'ahi vamos',
+      })
+    );
+  }
 }
 
 function UsarFlooding(mensaje) {
-  let vecinos = GetNeig(mensaje.NodoInicio);
-  console.log('sus vecinos son ', vecinos);
-  vecinos.forEach((element) => {
-    if (element != mensaje.NodoPrevio) {
+  let vecinitos = GrafoCSV[mensaje.NodoInicio];
+  for (var key in vecinitos){
+    if (key != mensaje.NodoPrevio){
+
       const objeto = {
         option: 6,
         NodoPrevio: mensaje.NodoInicio,
-        NodoInicio: element,
+        NodoInicio: key,
         NodoFin: mensaje.NodoFin,
         mensaje: mensaje.mensaje,
         hopCount: mensaje.hopCount - 1,
       };
-      NodosActuales[element].send(JSON.stringify(objeto));
-    }
-  });
-}
+      NodosActuales[key].send(JSON.stringify(objeto));
 
-function GetNeig(NodoActual) {
-  let nodos_pruebas;
-  Grafo.forEach((element) => {
-    if (element.name === NodoActual) {
-      nodos_pruebas = element;
     }
-  });
-  let vecinitos = nodos_pruebas.neighbors;
-  let nombre_vecinitos = [];
-  vecinitos.forEach((element) => {
-    nombre_vecinitos.push(element.name);
-  });
-  return nombre_vecinitos;
+  }
 }
-
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -289,7 +224,7 @@ function InterpretarMensaje(mensaje, cliente) {
 
     if (Object.keys(NodosActuales).length === Object.keys(GrafoCSV).length) {
       if (algoritmoUsado === 1) {
-        HabilitarMensajesFlooding();
+        HabilitarMensajesFlooding(Object.keys(GrafoCSV).length);
       }
       // ! Comienza algoritmo para recorrer el grafo
       if (algoritmoUsado === 3) {
