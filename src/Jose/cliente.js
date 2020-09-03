@@ -6,6 +6,7 @@ const rl = readline.createInterface(process.stdin, process.stdout);
 
 const { fork } = require('child_process');
 const { truncate } = require('fs');
+const { allowedNodeEnvironmentFlags } = require('process');
 let processFork;
 
 // ? Se define la url del servidor
@@ -37,6 +38,83 @@ rl.question('Ingrese el nombre de su Nodo ', (nombre) => {
 });
 
 let GrafoCompleto;
+//**********************************************************************************************
+//**********************************************************************************************
+//**********************************************************************************************
+// ? Metodos flooding
+
+function EnviarMensajeFlooding(mensaje) {
+  console.log(mensaje.Grafo);
+  processFork = fork('./getInput.js');
+  processFork.send('servidor');
+
+  processFork.on('message', (message) => {
+    if (message.option === 0) process.exit();
+    console.log(`Destino ${message.destino}`);
+    console.log(`Mensaje ${message.mensaje}`);
+
+    const objeto = {
+      option: 5,
+      NodoPrevio: null,
+      NodoInicio: nombreNodo,
+      NodoFin: message.destino,
+      mensaje: message.mensaje,
+      hopCount: 5,
+    };
+
+    connection.send(JSON.stringify(objeto));
+  });
+}
+
+function ReplicarFlooding(mensaje) {
+  if (!(mensaje.NodoFin === nombreNodo)) {
+    if (mensaje.hopCount>0){
+      const objeto = {
+        option: 5,
+        NodoPrevio: mensaje.NodoPrevio,
+        NodoInicio: mensaje.NodoInicio,
+        NodoFin: mensaje.NodoFin,
+        mensaje: mensaje.mensaje,
+        hopCount: mensaje.hopCount -1,
+      };
+      console.log("Se envio de ",mensaje.NodoPrevio," a",nombreNodo);
+      console.log("Quedan ",mensaje.hopCount," saltos");
+      connection.send(JSON.stringify(objeto));
+    }
+    console.log("Se envio de ",mensaje.NodoPrevio," a",nombreNodo);
+    console.log("Quedan ",mensaje.hopCount," saltos");
+  } else {
+    console.log("Se envio de ",mensaje.NodoPrevio," a",nombreNodo);
+    console.log("Quedan ",mensaje.hopCount," saltos");
+    console.log("");
+    console.log(mensaje.mensaje);
+    console.log("");
+  }
+}
+
+function LogMensaje(objeto) {
+  if (objeto.NodoFin === nombreNodo) {
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
+      objeto.ruta.length
+    }
+  Distancia Total: ${objeto.distanciaTotal}
+  Mensaje: ${objeto.mensaje}
+  `);
+  } else {
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
+      objeto.ruta.length
+    }
+  Distancia Total: ${objeto.distanciaTotal}
+  `);
+  }
+}
+
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -187,8 +265,13 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 2) {
       // Crear nuevo cliente
       clienteDvr = new ClienteDVR(mensaje.nodo, mensaje.vecinos);
+    }    
+  } 
+  else if (mensaje.option === 2) {
+    
+    if (algoritmoUsado === 1){
+      EnviarMensajeFlooding(mensaje);
     }
-  } else if (mensaje.option === 2) {
 
     if (algoritmoUsado === 2) {
       // Enviar mensaje a cada vecino
@@ -208,7 +291,8 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 3) {
       IniciarAlgoritmo(mensaje);
     }
-  } else if (mensaje.option === 3) {
+  } 
+  else if (mensaje.option === 3) {
 
     if (algoritmoUsado === 2) {
 
@@ -221,16 +305,23 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 3) {
       ExplorarNodo(mensaje);
     }
-  } else if (mensaje.option === 4) {
+  } 
+  else if (mensaje.option === 4) {
     // ? Servidor envia grafo
     if (algoritmoUsado === 3) {
       GuardarGrafo(mensaje);
     }
-  } else if (mensaje.option === 5) {
+  } 
+  else if (mensaje.option === 5) {
     // ? Enviar Mensaje
     if (algoritmoUsado === 3) {
       console.log(mensaje);
       ReplicarMensaje(mensaje);
+    }
+  }
+  else if (mensaje.option === 6){
+    if(algoritmoUsado === 1){
+      ReplicarFlooding(mensaje);
     }
   }
 }

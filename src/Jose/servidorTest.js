@@ -30,6 +30,36 @@ rl.question(
   (algoritmo) => {
     if (algoritmo == 1) {
       console.log('Usando Flooding...');
+
+      let A = new Node((name = 'A'));
+      A.AddNeighbor(new Node((name = 'B'), (cost = 1)));
+      A.AddNeighbor(new Node((name = 'C'), (cost = 2)));
+      Grafo.push(A);
+
+      let B = new Node((name = 'B'));
+      B.AddNeighbor(new Node((name = 'A'), (cost = 1)));
+      B.AddNeighbor(new Node((name = 'E'), (cost = 4)));
+      B.AddNeighbor(new Node((name = 'C'), (cost = 3)));
+      B.AddNeighbor(new Node((name = 'D'), (cost = 5)));
+      Grafo.push(B);
+
+      let C = new Node((name = 'C'));
+      C.AddNeighbor(new Node((name = 'A'), (cost = 2)));
+      C.AddNeighbor(new Node((name = 'B'), (cost = 3)));
+      C.AddNeighbor(new Node((name = 'D'), (cost = 6)));
+      Grafo.push(C);
+
+      let D = new Node((name = 'D'));
+      D.AddNeighbor(new Node((name = 'C'), (cost = 6)));
+      D.AddNeighbor(new Node((name = 'B'), (cost = 5)));
+      D.AddNeighbor(new Node((name = 'E'), (cost = 7)));
+      Grafo.push(D);
+
+      let E = new Node((name = 'E'));
+      E.AddNeighbor(new Node((name = 'B'), (cost = 4)));
+      E.AddNeighbor(new Node((name = 'D'), (cost = 7)));
+      Grafo.push(E);
+      
       algoritmoUsado = 1;
     } else if (algoritmo == 2) {
       console.log('Usando Distance vector routing...');
@@ -78,6 +108,7 @@ rl.question(
     rl.close();
   }
 );
+
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -85,6 +116,81 @@ rl.question(
 let NodosActuales = {};
 let nodosVisitados = [];
 let GrafoChico = [];
+
+//**********************************************************************************************
+//**********************************************************************************************
+//**********************************************************************************************
+// ? Metodos Flooding
+let Grafito=[]
+function HabilitarMensajesFlooding(){
+  NodosActuales['A'].send(
+    JSON.stringify({
+      option: 2,
+      Grafo: "ahi vamos prrrrro",
+    })
+  );
+  NodosActuales['B'].send(
+    JSON.stringify({
+      option: 2,
+      Grafo: "ahi vamos prrrrro",
+    })
+  );
+  NodosActuales['C'].send(
+    JSON.stringify({
+      option: 2,
+      Grafo: "ahi vamos prrrrro",
+    })
+  );
+  NodosActuales['D'].send(
+    JSON.stringify({
+      option: 2,
+      Grafo: "ahi vamos prrrrro",
+    })
+  );
+  NodosActuales['E'].send(
+    JSON.stringify({
+      option: 2,
+      Grafo: "ahi vamos prrrrro",
+    })
+  );
+  
+}
+
+function UsarFlooding(mensaje){
+  let vecinos = GetNeig(mensaje.NodoInicio);
+  console.log("sus vecinos son ", vecinos);
+  vecinos.forEach((element) => {
+    if (element != mensaje.NodoPrevio){
+      const objeto = {
+        option: 6,
+        NodoPrevio: mensaje.NodoInicio,
+        NodoInicio: element,
+        NodoFin: mensaje.NodoFin,
+        mensaje: mensaje.mensaje,
+        hopCount: mensaje.hopCount-1,
+      };
+      NodosActuales[element].send(JSON.stringify(objeto));
+    }
+  });
+}
+
+function GetNeig(NodoActual) {
+  let nodos_pruebas;
+  Grafo.forEach((element) => {
+    if (element.name === NodoActual) {
+      nodos_pruebas = element;
+    }
+  });
+  let vecinitos = nodos_pruebas.neighbors;
+  let nombre_vecinitos=[];
+  vecinitos.forEach((element)=>{
+    nombre_vecinitos.push(element.name);
+  });
+  return nombre_vecinitos;
+}
+
+
+
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -101,7 +207,7 @@ function ConvertToJSON(grafo) {
       nuevoGrafo[nodo.name][neighbor.name] = neighbor.cost;
     });
   });
-  //console.log(nuevoGrafo);
+  console.log(nuevoGrafo);
   return nuevoGrafo;
 }
 
@@ -180,24 +286,33 @@ function InterpretarMensaje(mensaje, cliente) {
     );
 
     if (Object.keys(NodosActuales).length === 5) {
+      if (algoritmoUsado === 1){
+        HabilitarMensajesFlooding();
+      }
       // ! Comienza algoritmo para recorrer el grafo
       if (algoritmoUsado === 3) {
         IniciarAlgoritmo('A', 'E');
       }
     }
-  } else if (mensaje.option === 3) {
+  } 
+  else if (mensaje.option === 3) {
     //! Explorar nuevo nodo
 
     if (algoritmoUsado === 3) {
       console.log(mensaje);
       VisitarNuevoNodo(mensaje.nextNodo, mensaje.NodoInicio, mensaje.NodoFin);
     }
-  } else if (mensaje.option === 4) {
+  } 
+  else if (mensaje.option === 4) {
     //! Fin de algoritmo
     if (algoritmoUsado === 3) {
       EnviarGrafo(mensaje);
     }
-  } else if (mensaje.option === 5) {
+  } 
+  else if (mensaje.option === 5) {
+    if (algoritmoUsado === 1){
+      UsarFlooding(mensaje);
+    }
     //! Enviar mensaje
     if (algoritmoUsado === 3) {
       console.log(mensaje);
@@ -292,4 +407,6 @@ s.on('connection', function(ws) {
 
   console.log('cliente conectado ');
   console.log(Grafo);
+  
+
 });
