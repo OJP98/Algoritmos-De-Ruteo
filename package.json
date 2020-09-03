@@ -4,6 +4,8 @@
   "description": "Algoritmos de Ruteo",
   "main": "src/index.js",
   "scripts": {
+    "server": "node src/Jose/servidorTest.js",
+    "client": "node src/Jose/cliente.js",
     "start": "node src/index.js",
     "flooding": "node src/flooding.js",
     "dvr": "node src/Oscar/dvr.js",

@@ -28,7 +28,7 @@ var dvr;
 var clientesDvr = {};
 // ? Se lee el csv con la informacion del grafo
 let GrafoCSV = {};
-fs.createReadStream('grafo.csv')
+fs.createReadStream('src/Jose/grafo.csv')
   .pipe(csv())
   .on('data', function (row) {
     if (GrafoCSV[row.Nodo1] === undefined) {
@@ -97,8 +97,8 @@ function HabilitarMensajesFlooding(cantidad) {
 
 function UsarFlooding(mensaje) {
   let vecinitos = GrafoCSV[mensaje.NodoInicio];
-  for (var key in vecinitos){
-    if (key != mensaje.NodoPrevio){
+  for (var key in vecinitos) {
+    if (key != mensaje.NodoPrevio) {
       let distancias = parseInt(mensaje.Distancia) + parseInt(vecinitos[key]);
       const objeto = {
         option: 6,

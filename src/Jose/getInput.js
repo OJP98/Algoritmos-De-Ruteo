@@ -11,17 +11,16 @@ async function inputListener(servidor) {
         option: 0,
       });
       process.exit();
-    } 
-    else {
-      console.log(mensaje.substring(0, mensaje.indexOf('>')));
-      console.log(mensaje.substring(mensaje.indexOf('>') + 1, mensaje.length));
+    } else {
+      // console.log(mensaje.substring(0, mensaje.indexOf('>')));
+      // console.log(mensaje.substring(mensaje.indexOf('>') + 1, mensaje.length));
       process.send({
         option: 1,
         destino: mensaje.substring(mensaje.indexOf('>') + 1, mensaje.length),
         mensaje: mensaje.substring(0, mensaje.indexOf('>')),
       });
     }
-    
+
     inputListener();
 
   });

@@ -187,8 +187,8 @@ function GuardarGrafo(mensaje) {
 
   processFork.on('message', (message) => {
     if (message.option === 0) process.exit();
-    console.log(`Destino ${message.destino}`);
-    console.log(`Mensaje ${message.mensaje}`);
+    console.log(`Destino: ${message.destino}`);
+    console.log(`Mensaje: ${message.mensaje}`);
 
     const ruta = LinkAlgorithm.findShortestPath(
       GrafoCompleto,
@@ -230,13 +230,13 @@ function ReplicarMensaje(mensaje) {
 }
 
 function InputLibre(mensaje) {
-  processFork = fork('./getInput.js');
+  processFork = fork('src/Jose/getInput.js');
   processFork.send('servidor');
 
   processFork.on('message', (message) => {
     if (message.option === 0) process.exit();
-    console.log(`Destino ${message.destino}`);
-    console.log(`Mensaje ${message.mensaje}`);
+    console.log(`Destino: ${message.destino}`);
+    console.log(`Mensaje: ${message.mensaje}`);
 
     try {
       const ruta = clienteDvr.GetNextNode(message.destino);
