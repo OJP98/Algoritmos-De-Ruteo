@@ -157,14 +157,7 @@ function EnviarGrafo(mensaje) {
 }
 
 function EnviarMensaje(mensaje) {
-  Object.keys(NodosActuales).forEach((element) => {
-    NodosActuales[element].send(
-      JSON.stringify({
-        option: 5,
-        mensaje: mensaje.mensaje,
-      })
-    );
-  });
+  NodosActuales[mensaje.nextNodo].send(JSON.stringify(mensaje));
 }
 
 //**********************************************************************************************

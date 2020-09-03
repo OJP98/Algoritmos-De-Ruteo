@@ -4,6 +4,10 @@ const LSR = require('./lsr');
 const ClienteDVR = require('../Oscar/clientedvr');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
+const { fork } = require('child_process');
+const { truncate } = require('fs');
+let processFork;
+
 // ? Se define la url del servidor
 if (process.argv[2] === undefined) {
   var url = 'ws://localhost:4200';
@@ -101,17 +105,50 @@ function ExplorarNodo(mensaje) {
 
 function GuardarGrafo(mensaje) {
   GrafoCompleto = mensaje.Grafo;
+  processFork = fork('./getInput.js');
+  processFork.send('servidor');
 
-  while (true) {
-    console.log('Hola');
-    connection.send(
-      JSON.stringify({
-        option: 5,
-        mensaje: 'Que onda',
-        NodoInicio: mensaje.NodoInicio,
-        NodoFin: mensaje.NodoFin,
-      })
+  processFork.on('message', (message) => {
+    if (message.option === 0) process.exit();
+    console.log(`Destino ${message.destino}`);
+    console.log(`Mensaje ${message.mensaje}`);
+
+    const ruta = LinkAlgorithm.findShortestPath(
+      GrafoCompleto,
+      nombreNodo,
+      message.destino
     );
+    const objeto = {
+      option: 5,
+      NodoInicio: nombreNodo,
+      NodoFin: message.destino,
+      mensaje: message.mensaje,
+      ruta: ruta.path,
+      distanciaTotal: ruta.distance,
+      nextNodo: ruta.path[1],
+    };
+
+    connection.send(JSON.stringify(objeto));
+    LogMensaje(objeto);
+  });
+}
+
+function ReplicarMensaje(mensaje) {
+  if (!(mensaje.NodoFin === nombreNodo)) {
+    const objeto = {
+      option: 5,
+      NodoInicio: mensaje.NodoInicio,
+      NodoFin: mensaje.NodoFin,
+      mensaje: mensaje.mensaje,
+      ruta: mensaje.ruta,
+      distanciaTotal: mensaje.distanciaTotal,
+      nextNodo: mensaje.ruta[mensaje.ruta.indexOf(nombreNodo) + 1],
+    };
+
+    connection.send(JSON.stringify(objeto));
+    LogMensaje(objeto);
+  } else {
+    LogMensaje(mensaje);
   }
 }
 
@@ -119,6 +156,29 @@ function GuardarGrafo(mensaje) {
 //**********************************************************************************************
 //**********************************************************************************************
 let algoritmoUsado;
+
+function LogMensaje(objeto) {
+  if (objeto.NodoFin === nombreNodo) {
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
+      objeto.ruta.length
+    }
+  Distancia Total: ${objeto.distanciaTotal}
+  Mensaje: ${objeto.mensaje}
+  `);
+  } else {
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
+      objeto.ruta.length
+    }
+  Distancia Total: ${objeto.distanciaTotal}
+  `);
+  }
+}
 
 function InterpretarMensaje(mensaje) {
   if (mensaje.option === 1) {
@@ -146,7 +206,8 @@ function InterpretarMensaje(mensaje) {
   } else if (mensaje.option === 5) {
     // ? Enviar Mensaje
     if (algoritmoUsado === 3) {
-      log(mensaje);
+      console.log(mensaje);
+      ReplicarMensaje(mensaje);
     }
   }
 }
