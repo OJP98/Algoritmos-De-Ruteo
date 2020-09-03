@@ -129,7 +129,7 @@ function IniciarAlgoritmo(mensaje) {
     mensaje.NodoInicio,
     mensaje.NodoFin
   );
-  LinkAlgorithm.printTable(iterLink);
+  LinkAlgorithm.printTable(iterLink, mensaje.nodosVisitados);
   const nextNodo = LinkAlgorithm.GetNextNodo(
     iterLink['distances'],
     mensaje.nodosVisitados
@@ -153,7 +153,7 @@ function ExplorarNodo(mensaje) {
     mensaje.NodoInicio,
     mensaje.NodoFin
   );
-  LinkAlgorithm.printTable(iterLink);
+  LinkAlgorithm.printTable(iterLink, mensaje.nodosVisitados);
   const nextNodo = LinkAlgorithm.GetNextNodo(
     iterLink['distances'],
     mensaje.nodosVisitados

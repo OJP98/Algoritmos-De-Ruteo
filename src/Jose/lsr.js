@@ -19,13 +19,6 @@ class LSR {
   */
   GetNextNodo(distances, nodosVisitados) {
     const sortedDistances = Object.values(distances).sort();
-    console.log('Distancias********************');
-    console.log(sortedDistances);
-    console.log();
-    console.log(nodosVisitados);
-    console.log();
-    console.log(distances);
-    console.log('Distancias********************');
 
     const distancesKeys = Object.keys(distances);
 
@@ -39,16 +32,6 @@ class LSR {
         }
       }
     }
-    /*
-    for (let index = 0; index < distancesKeys.length; index++) {
-      if (
-        sortedDistances[0] == distances[distancesKeys[index]] &&
-        !nodosVisitados.includes(distancesKeys[index])
-      ) {
-        return distancesKeys[index];
-      }
-    }
-    */
     return false;
   }
 
@@ -56,7 +39,8 @@ class LSR {
   Imprime la tabla de distancia y nodo
   padre
   */
-  printTable(iterLink) {
+  printTable(iterLink, nodosVisitados) {
+    console.log(`Nodos Visitados: ${nodosVisitados}`);
     console.log('Nodo \t Dist. \t padre');
     Object.keys(iterLink['distances']).forEach((element) => {
       if (iterLink['distances'][element] === 'Infinity') {
