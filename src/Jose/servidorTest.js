@@ -97,15 +97,18 @@ function HabilitarMensajesFlooding(cantidad) {
 
 function UsarFlooding(mensaje) {
   let vecinitos = GrafoCSV[mensaje.NodoInicio];
-  for (var key in vecinitos) {
-    if (key != mensaje.NodoPrevio) {
-
+  for (var key in vecinitos){
+    if (key != mensaje.NodoPrevio){
+      let distancias = parseInt(mensaje.Distancia) + parseInt(vecinitos[key]);
       const objeto = {
         option: 6,
         NodoPrevio: mensaje.NodoInicio,
+        NodosUsados: mensaje.NodosUsados,
         NodoInicio: key,
         NodoFin: mensaje.NodoFin,
+        Distancia: distancias,
         mensaje: mensaje.mensaje,
+        NodoEmisor: mensaje.NodoEmisor,
         hopCount: mensaje.hopCount - 1,
       };
       NodosActuales[key].send(JSON.stringify(objeto));

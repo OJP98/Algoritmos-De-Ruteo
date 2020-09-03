@@ -55,6 +55,7 @@ let saltos;
 
 function EnviarMensajeFlooding(mensaje) {
   saltos = mensaje.hopCount;
+  let distancias = 0;
   processFork = fork('./getInput.js');
   processFork.send('servidor');
 
@@ -62,12 +63,18 @@ function EnviarMensajeFlooding(mensaje) {
     if (message.option === 0) process.exit();
     console.log(`Destino ${message.destino}`);
     console.log(`Mensaje ${message.mensaje}`);
+    let nodos_usados = [];
+    console.log(typeof (nodos_usados));
+    nodos_usados.push(nombreNodo);
 
     const objeto = {
       option: 5,
       NodoPrevio: null,
+      NodosUsados: nodos_usados,
       NodoInicio: nombreNodo,
+      NodoEmisor: nombreNodo,
       NodoFin: message.destino,
+      Distancia: distancias,
       mensaje: message.mensaje,
       hopCount: saltos - 1,
     };
@@ -77,28 +84,33 @@ function EnviarMensajeFlooding(mensaje) {
 }
 
 function ReplicarFlooding(mensaje) {
+  let nodos_usados = mensaje.NodosUsados;
+  nodos_usados.push(nombreNodo);
   if (!(mensaje.NodoFin === nombreNodo)) {
     if (mensaje.hopCount > 0) {
       const objeto = {
         option: 5,
         NodoPrevio: mensaje.NodoPrevio,
+        NodosUsados: nodos_usados,
         NodoInicio: mensaje.NodoInicio,
+        NodoEmisor: mensaje.NodoEmisor,
         NodoFin: mensaje.NodoFin,
+        Distancia: mensaje.Distancia,
         mensaje: mensaje.mensaje,
         hopCount: mensaje.hopCount,
       };
-      console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
-      console.log('Quedan ', mensaje.hopCount, ' saltos');
+      //console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
       connection.send(JSON.stringify(objeto));
     }
-    console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
-    console.log('Quedan ', mensaje.hopCount, ' saltos');
+    //console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
+    //console.log('Quedan ', mensaje.hopCount, ' saltos');
   } else {
-    console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
-    console.log('Quedan ', mensaje.hopCount, ' saltos');
-    console.log('');
-    console.log(mensaje.mensaje);
-    console.log('');
+    console.log('******************************************************************');
+    console.log("Ha recibido un mensaje de parte de ", mensaje.NodoEmisor, ": ", mensaje.mensaje);
+    console.log("Se dieron ", saltos - mensaje.hopCount, " saltos");
+    console.log("Los nodos utilizados fueron ", mensaje.NodosUsados);
+    console.log("La distancia recorrida fue de ", mensaje.Distancia, " unidades de distancia")
+    console.log('******************************************************************');
   }
 }
 
