@@ -105,15 +105,9 @@ function HabilitarMensajesFlooding(cantidad) {
 
 function UsarFlooding(mensaje) {
   let vecinitos = GrafoCSV[mensaje.NodoInicio];
-<<<<<<< Updated upstream
-  for (var key in vecinitos) {
-    if (key != mensaje.NodoPrevio) {
-
-=======
   for (var key in vecinitos){
     if (key != mensaje.NodoPrevio){
       let distancias = parseInt(mensaje.Distancia) + parseInt(vecinitos[key]);
->>>>>>> Stashed changes
       const objeto = {
         option: 6,
         NodoPrevio: mensaje.NodoInicio,
