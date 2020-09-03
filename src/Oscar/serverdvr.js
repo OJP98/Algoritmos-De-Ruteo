@@ -30,10 +30,12 @@ class ServerDVR {
       return node.name === nodeRequested;
     });
 
-    if (newNode == undefined) newNode = this.availableNodes.pop();
+    this.availableNodes = this.availableNodes.filter(node => (node !== newNode));
+
+    if (newNode === undefined)
+      newNode = this.availableNodes.pop();
 
     this.grafo[newNode.name] = newNode;
-    this.availableNodes.pop(newNode);
     console.log('EL GRAFO DEL SERVER AHORA ES: ');
     console.table(this.grafo);
     return [newNode.name, newNode.edges];

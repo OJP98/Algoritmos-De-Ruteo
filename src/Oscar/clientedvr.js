@@ -22,6 +22,10 @@ class ClienteDVR {
     this.node.UpdateRoutingVector();
   }
 
+  GetNextNode(destName) {
+    return this.node.routingVector[destName];
+  }
+
   NodeRecievedMessage(srcName, destName, message) {
     let result = this.node.EvaluateMessage(srcName, destName, message);
 

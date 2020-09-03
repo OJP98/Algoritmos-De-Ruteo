@@ -4,9 +4,18 @@ const LSR = require('./lsr');
 const ClienteDVR = require('../Oscar/clientedvr');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
-const { fork } = require('child_process');
-const { truncate } = require('fs');
-const { allowedNodeEnvironmentFlags } = require('process');
+const {
+  fork
+} = require('child_process');
+const {
+  truncate
+} = require('fs');
+const {
+  allowedNodeEnvironmentFlags
+} = require('process');
+const {
+  parse
+} = require('path');
 let processFork;
 
 // ? Se define la url del servidor
@@ -43,8 +52,9 @@ let GrafoCompleto;
 //**********************************************************************************************
 // ? Metodos flooding
 let saltos;
+
 function EnviarMensajeFlooding(mensaje) {
-  saltos=mensaje.hopCount;
+  saltos = mensaje.hopCount;
   processFork = fork('./getInput.js');
   processFork.send('servidor');
 
@@ -59,7 +69,7 @@ function EnviarMensajeFlooding(mensaje) {
       NodoInicio: nombreNodo,
       NodoFin: message.destino,
       mensaje: message.mensaje,
-      hopCount: saltos-1,
+      hopCount: saltos - 1,
     };
 
     connection.send(JSON.stringify(objeto));
@@ -207,6 +217,80 @@ function ReplicarMensaje(mensaje) {
   }
 }
 
+function InputLibre(mensaje) {
+  processFork = fork('./getInput.js');
+  processFork.send('servidor');
+
+  processFork.on('message', (message) => {
+    if (message.option === 0) process.exit();
+    console.log(`Destino ${message.destino}`);
+    console.log(`Mensaje ${message.mensaje}`);
+
+    try {
+      const ruta = clienteDvr.GetNextNode(message.destino);
+      const objeto = {
+        option: 5,
+        NodoInicio: clienteDvr.NodeName,
+        NodoFin: message.destino,
+        mensaje: message.mensaje,
+        ruta: ruta.path,
+        distanciaTotal: ruta.cost,
+        saltos: 0
+      };
+
+      connection.send(JSON.stringify(objeto));
+      LogMensajeDvr(objeto);
+
+    } catch (error) {
+      console.log('ERROR AL ENVIAR MENSAJE. INTENTE DE NUEVO\n');
+    }
+  });
+}
+
+function EvaluarMensaje(mensaje) {
+  if (mensaje.NodoFin !== clienteDvr.NodeName) {
+
+    let saltosTotales = parseInt(mensaje.saltos) + 1;
+    const ruta = clienteDvr.GetNextNode(mensaje.NodoFin);
+    const objeto = {
+      option: 5,
+      NodoInicio: mensaje.NodoInicio,
+      NodoFin: mensaje.NodoFin,
+      mensaje: mensaje.mensaje,
+      ruta: ruta.path,
+      distanciaTotal: mensaje.distanciaTotal,
+      saltos: saltosTotales
+    }
+
+    connection.send(JSON.stringify(objeto));
+    LogMensajeDvr(objeto);
+  } else {
+    mensaje.saltos = mensaje.saltos + 1;
+    LogMensajeDvr(mensaje);
+  }
+}
+
+function LogMensajeDvr(objeto) {
+  if (objeto.NodoFin === clienteDvr.NodeName) {
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Ruta: ${objeto.ruta}
+  Saltos Recorridos: ${objeto.saltos}
+  Distancia Total: ${objeto.distanciaTotal}
+  Mensaje: ${objeto.mensaje}
+  `);
+  } else {
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Ruta: ${objeto.ruta}
+  Saltos Recorridos: ${objeto.saltos}
+  Distancia Total: ${objeto.distanciaTotal}
+  `);
+  }
+}
+
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -293,11 +377,17 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 3) {
       console.log(mensaje);
       ReplicarMensaje(mensaje);
+
+    } else if (algoritmoUsado === 2) {
+      EvaluarMensaje(mensaje);
     }
+
   } else if (mensaje.option === 6) {
     if (algoritmoUsado === 1) {
       ReplicarFlooding(mensaje);
     }
+  } else if (mensaje.option === 7) {
+    InputLibre();
   }
 }
 
@@ -306,7 +396,6 @@ function InterpretarMensaje(mensaje) {
 //**********************************************************************************************
 // ? Metodos propios del cliente
 connection.onmessage = (mensaje) => {
-  console.log(mensaje.data);
   InterpretarMensaje(JSON.parse(mensaje.data));
 };
 

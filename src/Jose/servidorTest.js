@@ -252,6 +252,17 @@ function InterpretarMensaje(mensaje, cliente) {
           counter += 1;
           if (counter > 3) clearInterval(interval);
         }, 200);
+
+        // Enviarle a todos que estamos listos
+        s.clients.forEach(function each(client) {
+          if (client.readyState === CLIENT_READY) {
+            client.send(
+              JSON.stringify({
+                option: 7,
+              })
+            );
+          }
+        });
       }
     } else {
       NodosActuales[mensaje.nodo] = cliente;
@@ -283,8 +294,6 @@ function InterpretarMensaje(mensaje, cliente) {
 
       if (destClient == null) return;
 
-      console.log(`${srcName} ==INFO=> ${destName}`);
-
       destClient.send(
         JSON.stringify({
           option: 3,
@@ -314,6 +323,12 @@ function InterpretarMensaje(mensaje, cliente) {
       console.log(mensaje);
       EnviarMensaje(mensaje);
     }
+
+    if (algoritmoUsado === 2) {
+      clientesDvr[mensaje.ruta].send(
+        JSON.stringify(mensaje)
+      );
+    }
   }
 }
 
@@ -332,6 +347,6 @@ s.on('connection', function (ws) {
   });
 
   console.log('cliente conectado ');
-  console.log(Grafo);
+  // console.log(Grafo);
   console.log(GrafoCSV);
 });

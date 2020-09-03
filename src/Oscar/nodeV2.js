@@ -15,7 +15,10 @@ class Node {
    * @param {number} cost delay para llegar a este nuevo nodo
    */
   AddNeighbor(nodeName, cost) {
-    this.edges.push({ name: nodeName, cost });
+    this.edges.push({
+      name: nodeName,
+      cost
+    });
     this.routingVector[nodeName] = {
       cost,
       path: nodeName
@@ -41,7 +44,7 @@ class Node {
    * @param {Object} srcRoutingVector vector de rutas del nodo emisor
    */
   ReceivedNewInformation(srcName, srcRoutingVector) {
-    console.log(`${this.name} <==INFO== ${srcName}`);
+    // console.log(`${this.name} <==INFO== ${srcName}`);
     var currentDist;
     var path, min, currentDist;
 
