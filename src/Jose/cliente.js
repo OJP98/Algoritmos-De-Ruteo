@@ -3,6 +3,7 @@ const readline = require('readline');
 const LSR = require('./lsr');
 const ClienteDVR = require('../Oscar/clientedvr');
 const rl = readline.createInterface(process.stdin, process.stdout);
+const chalk = require('chalk');
 
 const {
   fork
@@ -254,7 +255,7 @@ function InputLibre(mensaje) {
       LogMensajeDvr(objeto);
 
     } catch (error) {
-      console.log('ERROR AL ENVIAR MENSAJE. INTENTE DE NUEVO\n');
+      console.log(chalk.red.bgGrey('==ERROR AL ENVIAR MENSAJE. INTENTE DE NUEVO==\n'));
     }
   });
 }
@@ -284,6 +285,7 @@ function EvaluarMensaje(mensaje) {
 
 function LogMensajeDvr(objeto) {
   if (objeto.NodoFin === clienteDvr.NodeName) {
+    console.log(chalk.green.bgGrey('========NUEVA ENTRADA========'))
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
@@ -292,7 +294,20 @@ function LogMensajeDvr(objeto) {
   Distancia Total: ${objeto.distanciaTotal}
   Mensaje: ${objeto.mensaje}
   `);
+    console.log(chalk.green.bgGrey('=============================='))
+  } else if (objeto.NodoInicio === clienteDvr.NodeName) {
+    console.log(chalk.green.bgGrey('============EMISOR============'))
+    console.log(`
+  Nodo Fuente: ${objeto.NodoInicio}
+  Nodo Destino: ${objeto.NodoFin}
+  Ruta: ${objeto.ruta}
+  Saltos Recorridos: ${objeto.saltos}
+  Distancia Total: ${objeto.distanciaTotal}
+  Mensaje: ${objeto.mensaje}
+  `);
+    console.log(chalk.green.bgGrey('=============================='))
   } else {
+    console.log(chalk.blue.bgGrey('========INTERMEDIARIO========'))
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
@@ -300,6 +315,7 @@ function LogMensajeDvr(objeto) {
   Saltos Recorridos: ${objeto.saltos}
   Distancia Total: ${objeto.distanciaTotal}
   `);
+    console.log(chalk.blue.bgGrey('=============================='));
   }
 }
 

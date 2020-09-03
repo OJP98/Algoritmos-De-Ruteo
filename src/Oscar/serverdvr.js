@@ -36,8 +36,8 @@ class ServerDVR {
       newNode = this.availableNodes.pop();
 
     this.grafo[newNode.name] = newNode;
-    console.log('EL GRAFO DEL SERVER AHORA ES: ');
-    console.table(this.grafo);
+    // console.log('EL GRAFO DEL SERVER AHORA ES: ');
+    // console.table(this.grafo);
     return [newNode.name, newNode.edges];
   }
 
