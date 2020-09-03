@@ -1,4 +1,4 @@
-const Node = require('./node');
+const Node = require('./nodeV2');
 
 class ServerDVR {
 
@@ -15,34 +15,34 @@ class ServerDVR {
     this.h = new Node('H');
     this.i = new Node('I');
 
-    this.a.AddNeighbor(this.b, 7);
-    this.a.AddNeighbor(this.i, 1);
-    this.a.AddNeighbor(this.c, 7);
+    this.a.AddNeighbor('B', 7);
+    this.a.AddNeighbor('I', 1);
+    this.a.AddNeighbor('C', 7);
 
-    this.b.AddNeighbor(this.a, 7);
-    this.b.AddNeighbor(this.f, 2);
+    this.b.AddNeighbor('A', 7);
+    this.b.AddNeighbor('F', 2);
 
-    this.c.AddNeighbor(this.a, 7);
-    this.c.AddNeighbor(this.d, 5);
+    this.c.AddNeighbor('A', 7);
+    this.c.AddNeighbor('D', 5);
 
-    this.d.AddNeighbor(this.i, 6);
-    this.d.AddNeighbor(this.c, 5);
-    this.d.AddNeighbor(this.e, 1);
+    this.d.AddNeighbor('I', 6);
+    this.d.AddNeighbor('C', 5);
+    this.d.AddNeighbor('E', 1);
 
-    this.e.AddNeighbor(this.d, 1);
-    this.e.AddNeighbor(this.g, 4);
+    this.e.AddNeighbor('D', 1);
+    this.e.AddNeighbor('G', 4);
 
-    this.f.AddNeighbor(this.g, 3);
-    this.f.AddNeighbor(this.h, 4);
-    this.f.AddNeighbor(this.b, 2);
+    this.f.AddNeighbor('G', 3);
+    this.f.AddNeighbor('H', 4);
+    this.f.AddNeighbor('B', 2);
 
-    this.g.AddNeighbor(this.e, 4);
-    this.g.AddNeighbor(this.f, 3);
+    this.g.AddNeighbor('E', 4);
+    this.g.AddNeighbor('F', 3);
 
-    this.h.AddNeighbor(this.f, 4);
+    this.h.AddNeighbor('F', 4);
 
-    this.i.AddNeighbor(this.a, 1);
-    this.i.AddNeighbor(this.d, 6);
+    this.i.AddNeighbor('A', 1);
+    this.i.AddNeighbor('D', 6);
 
     this.availableNodes.push(
       this.a,
@@ -53,7 +53,7 @@ class ServerDVR {
       this.f,
       this.g,
       this.h,
-      this.i
+      this.i,
     );
   }
 
@@ -61,12 +61,9 @@ class ServerDVR {
     let newNode = this.availableNodes.shift();
     this.grafo[newNode.name] = newNode;
 
-    let edgeList = [];
-    newNode.edges.forEach(edge => {
-      edgeList.push(newNode.routingVector[edge.name]);
-    });
-
-    return [newNode.name, edgeList];
+    console.log('EL GRAFO DEL SERVER AHORA ES: ');
+    console.table(this.grafo);
+    return [newNode.name, newNode.edges];
   }
 }
 

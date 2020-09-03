@@ -1,27 +1,21 @@
-const Node = require('./node');
+const Node = require('./nodeV2');
 
 class ClienteDVR {
   constructor(nodeName, edges) {
     this.node = new Node(nodeName);
+    edges.forEach(edge => {
+      this.NodeAddNeighbor(edge.name, edge.cost);
+    });
+
+    console.log(this.node);
   }
 
   NodeAddNeighbor(newNode, cost) {
     this.node.AddNeighbor(newNode, cost);
   }
 
-  NodeSendRoutingVectorToNeighbors() {
-    this.node.edges.forEach(edge => {
-      // TODO: Mandar routingvector al server
-    });
-  }
-
-  NodeSendMessage(srcName, destName, message) {
-    // TODO: Enviar mensaje con ayuda de server
-  }
-
   NodeReceivedRoutingVector(srcName, srcRoutingVector) {
     this.node.ReceivedNewInformation(srcName, srcRoutingVector);
-    this.NodeSendRoutingVectorToNeighbors();
   }
 
   NodeUpdateRoutingVector() {
@@ -35,11 +29,18 @@ class ClienteDVR {
     else console.log(`${this.node.name} RECIBE DE ${srcName}: ${result}`);
   }
 
-  PrintNode(node) {
-    console.log({
-      node
-    });
+  get NodeNeighbors() {
+    return this.node.edges.map(edge => edge.name);
   }
+
+  get NodeName() {
+    return this.node.name;
+  }
+
+  GetNodeRoutingVector() {
+    return this.node.routingVector;
+  }
+
 }
 
 module.exports = ClienteDVR;

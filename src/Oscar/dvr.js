@@ -1,55 +1,120 @@
-const Node = require('./node');
+const Node = require('./nodeV2');
 const chalk = require('chalk');
 const NODE_LIST = [];
 
-let a = new Node('A');
-let b = new Node('B');
-let c = new Node('C');
-let d = new Node('D');
-let e = new Node('E');
-let f = new Node('F');
-let g = new Node('G');
-let h = new Node('H');
-let i = new Node('I');
+let A = new Node('A');
+let B = new Node('B');
+let C = new Node('C');
+let D = new Node('D');
+let E = new Node('E');
+let F = new Node('F');
+let G = new Node('G');
+let H = new Node('H');
+let I = new Node('I');
 
-NODE_LIST.push(a, b, c, d, e, f, g, h, i);
+NODE_LIST.push(A, B, C, D, E, F, G, H, I);
 
-a.AddNeighbor(b, 7);
-a.AddNeighbor(i, 1);
-a.AddNeighbor(c, 7);
+A.AddNeighbor('B', 7);
+A.AddNeighbor('I', 1);
+A.AddNeighbor('C', 7);
 
-b.AddNeighbor(a, 7);
-b.AddNeighbor(f, 2);
+B.AddNeighbor('A', 7);
+B.AddNeighbor('F', 2);
 
-c.AddNeighbor(a, 7);
-c.AddNeighbor(d, 5);
+C.AddNeighbor('A', 7);
+C.AddNeighbor('D', 5);
 
-d.AddNeighbor(i, 6);
-d.AddNeighbor(c, 5);
-d.AddNeighbor(e, 1);
+D.AddNeighbor('I', 6);
+D.AddNeighbor('C', 5);
+D.AddNeighbor('E', 1);
 
-e.AddNeighbor(d, 1);
-e.AddNeighbor(g, 4);
+E.AddNeighbor('D', 1);
+E.AddNeighbor('G', 4);
 
-f.AddNeighbor(g, 3);
-f.AddNeighbor(h, 4);
-f.AddNeighbor(b, 2);
+F.AddNeighbor('G', 3);
+F.AddNeighbor('H', 4);
+F.AddNeighbor('B', 2);
 
-g.AddNeighbor(e, 4);
-g.AddNeighbor(f, 3);
+G.AddNeighbor('E', 4);
+G.AddNeighbor('F', 3);
 
-h.AddNeighbor(f, 4);
+H.AddNeighbor('F', 4);
 
-i.AddNeighbor(a, 1);
-i.AddNeighbor(d, 6);
+I.AddNeighbor('A', 1);
+I.AddNeighbor('D', 6);
 
 
-NODE_LIST.forEach(node => {
-  // Actualizar el nodo
-  node.UpdateRoutingVector();
-  // Mandar mensaje a vecinos
-  node.SendRoutingVectorToNeighbors();
-});
+// NODE_LIST.forEach(node => {
+//   // Mandar mensaje a vecinos
+//   node.SendRoutingVectorToNeighbors();
+// });
+
+// NODE_LIST.forEach(node => {
+// node.ReceivedNewInformation
+// })
+
+// A.ReceivedNewInformation('B', B.routingVector);
+// A.ReceivedNewInformation('C', C.routingVector);
+// A.ReceivedNewInformation('I', I.routingVector);
+
+// B.ReceivedNewInformation('A', A.routingVector);
+// B.ReceivedNewInformation('F', F.routingVector);
+
+// C.ReceivedNewInformation('A', A.routingVector);
+// C.ReceivedNewInformation('D', D.routingVector);
+
+// D.ReceivedNewInformation('I', I.routingVector);
+// D.ReceivedNewInformation('C', C.routingVector);
+// D.ReceivedNewInformation('E', E.routingVector);
+
+// E.ReceivedNewInformation('D', D.routingVector);
+// E.ReceivedNewInformation('G', G.routingVector);
+
+// F.ReceivedNewInformation('G', G.routingVector);
+// F.ReceivedNewInformation('H', H.routingVector);
+// F.ReceivedNewInformation('B', B.routingVector);
+
+// G.ReceivedNewInformation('E', E.routingVector);
+// G.ReceivedNewInformation('F', F.routingVector);
+
+// H.ReceivedNewInformation('F', F.routingVector);
+
+// I.ReceivedNewInformation('A', A.routingVector);
+// I.ReceivedNewInformation('D', D.routingVector);
+
+// I.ReceivedNewInformation('A', A.routingVector);
+// I.ReceivedNewInformation('D', D.routingVector);
+
+// A.ReceivedNewInformation('B', B.routingVector);
+// A.ReceivedNewInformation('C', C.routingVector);
+// A.ReceivedNewInformation('I', I.routingVector);
+
+// B.ReceivedNewInformation('A', A.routingVector);
+// B.ReceivedNewInformation('F', F.routingVector);
+
+// C.ReceivedNewInformation('A', A.routingVector);
+// C.ReceivedNewInformation('D', D.routingVector);
+
+// D.ReceivedNewInformation('I', I.routingVector);
+// D.ReceivedNewInformation('C', C.routingVector);
+// D.ReceivedNewInformation('E', E.routingVector);
+
+// E.ReceivedNewInformation('D', D.routingVector);
+// E.ReceivedNewInformation('G', G.routingVector);
+
+// F.ReceivedNewInformation('G', G.routingVector);
+// F.ReceivedNewInformation('H', H.routingVector);
+// F.ReceivedNewInformation('B', B.routingVector);
+
+// G.ReceivedNewInformation('E', E.routingVector);
+// G.ReceivedNewInformation('F', F.routingVector);
+
+// H.ReceivedNewInformation('F', F.routingVector);
+
+
+// console.log(
+//   a.routingVector
+// );
 
 
 NODE_LIST.forEach(node => {

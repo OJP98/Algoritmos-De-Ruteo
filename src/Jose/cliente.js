@@ -11,7 +11,6 @@ if (process.argv[2] === undefined) {
   var url = process.argv[2];
 }
 const connection = new WebSocket(url);
-
 //**********************************************************************************************
 //**********************************************************************************************
 //**********************************************************************************************
@@ -126,14 +125,38 @@ function InterpretarMensaje(mensaje) {
     algoritmoUsado = mensaje.algoritmo;
 
     if (algoritmoUsado === 2) {
+      // Crear nuevo cliente
       clienteDvr = new ClienteDVR(mensaje.nodo, mensaje.vecinos);
     }
   } else if (mensaje.option === 2) {
+
+    if (algoritmoUsado === 2) {
+      // Enviar mensaje a cada vecino
+      clienteDvr.NodeNeighbors.forEach(vecino => {
+        connection.send(
+          JSON.stringify({
+            option: 2,
+            srcName: clienteDvr.NodeName,
+            destName: vecino,
+            routingVector: clienteDvr.GetNodeRoutingVector(),
+          })
+        )
+      });
+    }
+
     // ? Iniciar algoritmo
     if (algoritmoUsado === 3) {
       IniciarAlgoritmo(mensaje);
     }
   } else if (mensaje.option === 3) {
+
+    if (algoritmoUsado === 2) {
+
+      // Recibir y actualizar RV
+      clienteDvr.NodeReceivedRoutingVector(mensaje.srcName, mensaje.routingVector);
+      console.table(clienteDvr.GetNodeRoutingVector());
+    }
+
     // ? Explorar nuevo nodo
     if (algoritmoUsado === 3) {
       ExplorarNodo(mensaje);

@@ -1,8 +1,9 @@
 var server = require('ws').Server;
+const CLIENT_READY = require('ws').OPEN;
 const ServerDVR = require('../Oscar/serverdvr');
-const ClienteDVR = require('../Oscar/clientedvr');
 const readline = require('readline');
 const Node = require('./nodo');
+const chalk = require('chalk');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 // ? Se define el puerto del servidor
@@ -145,6 +146,7 @@ function VisitarNuevoNodo(nodoAVisita, NodoInicio, NodoFin) {
     })
   );
 }
+
 function EnviarGrafo(mensaje) {
   Object.keys(NodosActuales).forEach((element) => {
     NodosActuales[element].send(
@@ -212,15 +214,16 @@ function InterpretarMensaje(mensaje, cliente) {
 }
 
 function InterpretarMensajeDvr(mensaje, cliente) {
+
   // nueva conexion
   if (mensaje.option === 1) {
+
+    if (Object.keys(clientesDvr).length >= 9) return;
     // dvr brinda nodo disponible
     let nuevoNodo = dvr.NewClientConnected();
 
     // Cliente se agrega a mi diccionario de clientes.
     clientesDvr[nuevoNodo[0]] = cliente;
-
-    console.log(nuevoNodo);
 
     // Enviamos a cliente opcion, algoritmo y nodo correspondiente.
     cliente.send(
@@ -231,6 +234,51 @@ function InterpretarMensajeDvr(mensaje, cliente) {
         vecinos: nuevoNodo[1],
       })
     );
+
+    // Si todos están listos, enviar opción 2
+    if (Object.keys(clientesDvr).length === 9) {
+
+      var counter = 0;
+
+      const interval = setInterval(function() {
+        s.clients.forEach(function each(client) {
+          if (client.readyState === CLIENT_READY) {
+            client.send(
+              JSON.stringify({
+                option: 2
+              })
+            );
+          }
+        });
+
+        counter += 1;
+        if (counter > 3) clearInterval(interval);
+      }, 200);
+
+
+    }
+
+    // Enviar routing vector
+  } else if (mensaje.option === 2) {
+
+    let destName = mensaje.destName;
+    let srcName = mensaje.srcName;
+    let routingVector = mensaje.routingVector;
+    let destClient = clientesDvr[destName];
+
+    if (destClient == null) return;
+
+    console.log(`${srcName} ==INFO=> ${destName}`);
+
+    destClient.send(
+      JSON.stringify({
+        option: 3,
+        srcName,
+        routingVector
+      })
+    );
+
+
   }
 }
 
@@ -239,13 +287,13 @@ function InterpretarMensajeDvr(mensaje, cliente) {
 //**********************************************************************************************
 
 // ? Metodos del servidor
-s.on('connection', function (ws) {
-  ws.on('message', function (message) {
+s.on('connection', function(ws) {
+  ws.on('message', function(message) {
     InterpretarMensaje(JSON.parse(message), ws);
     // InterpretarMensajeDvr(JSON.parse(message), ws);
   });
 
-  ws.on('close', function (message) {
+  ws.on('close', function(message) {
     console.log('se cierra un cliente ' + message);
   });
 

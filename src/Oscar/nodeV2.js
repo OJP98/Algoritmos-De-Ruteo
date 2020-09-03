@@ -14,9 +14,8 @@ class Node {
    * @param {Node} newNode nodo a agregar como vecino
    * @param {number} cost delay para llegar a este nuevo nodo
    */
-  AddNeighbor(newNode, cost) {
-    let nodeName = newNode.name;
-    this.edges.push(newNode);
+  AddNeighbor(nodeName, cost) {
+    this.edges.push({ name: nodeName, cost });
     this.routingVector[nodeName] = {
       cost,
       path: nodeName
@@ -65,43 +64,6 @@ class Node {
         }
       }
     }
-  }
-
-  /**
-   * Actualiza su tabla en base a los vecinos que tiene.
-   */
-  UpdateRoutingVector() {
-    const srcRoutingVector = this.routingVector;
-    var path, min, srcDistToDest;
-
-    this.edges.forEach(edge => {
-
-      const edgeName = edge.name;
-      const edgeRoutingVector = edge.routingVector;
-      const srcDistToEdge = srcRoutingVector[edgeName].cost;
-
-      edge.edges.forEach(dest => {
-        if (dest.name != this.name) {
-          let destName = dest.name;
-          let edgeDistToDest = edgeRoutingVector[destName];
-
-          if (!srcRoutingVector[destName])
-            srcDistToDest = Infinity;
-          else
-            srcDistToDest = srcRoutingVector[destName].cost;
-
-          if (srcDistToEdge + edgeDistToDest.cost <= srcDistToDest) {
-            min = srcDistToEdge + edgeDistToDest.cost;
-            path = edgeName;
-            this.UpdateVector(destName, min, path);
-          } else if (destName in Object.keys(this.edges)) {
-            min = srcDistToDest;
-            path = destName;
-            this.UpdateVector(destName, min, path);
-          }
-        }
-      });
-    });
   }
 
 
