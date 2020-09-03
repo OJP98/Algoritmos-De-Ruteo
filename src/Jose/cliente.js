@@ -68,27 +68,27 @@ function EnviarMensajeFlooding(mensaje) {
 
 function ReplicarFlooding(mensaje) {
   if (!(mensaje.NodoFin === nombreNodo)) {
-    if (mensaje.hopCount>0){
+    if (mensaje.hopCount > 0) {
       const objeto = {
         option: 5,
         NodoPrevio: mensaje.NodoPrevio,
         NodoInicio: mensaje.NodoInicio,
         NodoFin: mensaje.NodoFin,
         mensaje: mensaje.mensaje,
-        hopCount: mensaje.hopCount -1,
+        hopCount: mensaje.hopCount - 1,
       };
-      console.log("Se envio de ",mensaje.NodoPrevio," a",nombreNodo);
-      console.log("Quedan ",mensaje.hopCount," saltos");
+      console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
+      console.log('Quedan ', mensaje.hopCount, ' saltos');
       connection.send(JSON.stringify(objeto));
     }
-    console.log("Se envio de ",mensaje.NodoPrevio," a",nombreNodo);
-    console.log("Quedan ",mensaje.hopCount," saltos");
+    console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
+    console.log('Quedan ', mensaje.hopCount, ' saltos');
   } else {
-    console.log("Se envio de ",mensaje.NodoPrevio," a",nombreNodo);
-    console.log("Quedan ",mensaje.hopCount," saltos");
-    console.log("");
+    console.log('Se envio de ', mensaje.NodoPrevio, ' a', nombreNodo);
+    console.log('Quedan ', mensaje.hopCount, ' saltos');
+    console.log('');
     console.log(mensaje.mensaje);
-    console.log("");
+    console.log('');
   }
 }
 
@@ -239,6 +239,7 @@ function LogMensaje(objeto) {
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
+  Ruta: ${objeto.ruta}
   Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
       objeto.ruta.length
     }
@@ -249,6 +250,7 @@ function LogMensaje(objeto) {
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
+  Ruta: ${objeto.ruta}
   Saltos Recorridos: ${objeto.ruta.indexOf(nombreNodo) + 1}/${
       objeto.ruta.length
     }
@@ -265,17 +267,15 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 2) {
       // Crear nuevo cliente
       clienteDvr = new ClienteDVR(mensaje.nodo, mensaje.vecinos);
-    }    
-  } 
-  else if (mensaje.option === 2) {
-    
-    if (algoritmoUsado === 1){
+    }
+  } else if (mensaje.option === 2) {
+    if (algoritmoUsado === 1) {
       EnviarMensajeFlooding(mensaje);
     }
 
     if (algoritmoUsado === 2) {
       // Enviar mensaje a cada vecino
-      clienteDvr.NodeNeighbors.forEach(vecino => {
+      clienteDvr.NodeNeighbors.forEach((vecino) => {
         connection.send(
           JSON.stringify({
             option: 2,
@@ -283,7 +283,7 @@ function InterpretarMensaje(mensaje) {
             destName: vecino,
             routingVector: clienteDvr.GetNodeRoutingVector(),
           })
-        )
+        );
       });
     }
 
@@ -291,13 +291,13 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 3) {
       IniciarAlgoritmo(mensaje);
     }
-  } 
-  else if (mensaje.option === 3) {
-
+  } else if (mensaje.option === 3) {
     if (algoritmoUsado === 2) {
-
       // Recibir y actualizar RV
-      clienteDvr.NodeReceivedRoutingVector(mensaje.srcName, mensaje.routingVector);
+      clienteDvr.NodeReceivedRoutingVector(
+        mensaje.srcName,
+        mensaje.routingVector
+      );
       console.table(clienteDvr.GetNodeRoutingVector());
     }
 
@@ -305,22 +305,19 @@ function InterpretarMensaje(mensaje) {
     if (algoritmoUsado === 3) {
       ExplorarNodo(mensaje);
     }
-  } 
-  else if (mensaje.option === 4) {
+  } else if (mensaje.option === 4) {
     // ? Servidor envia grafo
     if (algoritmoUsado === 3) {
       GuardarGrafo(mensaje);
     }
-  } 
-  else if (mensaje.option === 5) {
+  } else if (mensaje.option === 5) {
     // ? Enviar Mensaje
     if (algoritmoUsado === 3) {
       console.log(mensaje);
       ReplicarMensaje(mensaje);
     }
-  }
-  else if (mensaje.option === 6){
-    if(algoritmoUsado === 1){
+  } else if (mensaje.option === 6) {
+    if (algoritmoUsado === 1) {
       ReplicarFlooding(mensaje);
     }
   }

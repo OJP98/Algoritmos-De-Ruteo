@@ -4,6 +4,8 @@ const ServerDVR = require('../Oscar/serverdvr');
 const readline = require('readline');
 const Node = require('./nodo');
 const chalk = require('chalk');
+const fs = require('fs');
+const csv = require('csv-parser');
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 // ? Se define el puerto del servidor
@@ -24,90 +26,106 @@ let algoritmoUsado;
 let Grafo = [];
 var dvr = new ServerDVR();
 var clientesDvr = {};
-// ? Se define el algoritmo a usar
-rl.question(
-  'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
-  (algoritmo) => {
-    if (algoritmo == 1) {
-      console.log('Usando Flooding...');
-
-      let A = new Node((name = 'A'));
-      A.AddNeighbor(new Node((name = 'B'), (cost = 1)));
-      A.AddNeighbor(new Node((name = 'C'), (cost = 2)));
-      Grafo.push(A);
-
-      let B = new Node((name = 'B'));
-      B.AddNeighbor(new Node((name = 'A'), (cost = 1)));
-      B.AddNeighbor(new Node((name = 'E'), (cost = 4)));
-      B.AddNeighbor(new Node((name = 'C'), (cost = 3)));
-      B.AddNeighbor(new Node((name = 'D'), (cost = 5)));
-      Grafo.push(B);
-
-      let C = new Node((name = 'C'));
-      C.AddNeighbor(new Node((name = 'A'), (cost = 2)));
-      C.AddNeighbor(new Node((name = 'B'), (cost = 3)));
-      C.AddNeighbor(new Node((name = 'D'), (cost = 6)));
-      Grafo.push(C);
-
-      let D = new Node((name = 'D'));
-      D.AddNeighbor(new Node((name = 'C'), (cost = 6)));
-      D.AddNeighbor(new Node((name = 'B'), (cost = 5)));
-      D.AddNeighbor(new Node((name = 'E'), (cost = 7)));
-      Grafo.push(D);
-
-      let E = new Node((name = 'E'));
-      E.AddNeighbor(new Node((name = 'B'), (cost = 4)));
-      E.AddNeighbor(new Node((name = 'D'), (cost = 7)));
-      Grafo.push(E);
-      
-      algoritmoUsado = 1;
-    } else if (algoritmo == 2) {
-      console.log('Usando Distance vector routing...');
-      algoritmoUsado = 2;
-      // dvr = new ServerDvr();
-      dvr = new ServerDVR();
-      clientesDvr = {};
-    } else if (algoritmo == 3) {
-      console.log('Usando Link state routing...');
-      let A = new Node((name = 'A'));
-
-      A.AddNeighbor(new Node((name = 'B'), (cost = 2)));
-      A.AddNeighbor(new Node((name = 'C'), (cost = 4)));
-      A.AddNeighbor(new Node((name = 'D'), (cost = 10)));
-      Grafo.push(A);
-
-      let B = new Node((name = 'B'));
-      B.AddNeighbor(new Node((name = 'A'), (cost = 2)));
-      B.AddNeighbor(new Node((name = 'E'), (cost = 9)));
-      B.AddNeighbor(new Node((name = 'C'), (cost = 1)));
-      B.AddNeighbor(new Node((name = 'D'), (cost = 6)));
-      Grafo.push(B);
-
-      let C = new Node((name = 'C'));
-      C.AddNeighbor(new Node((name = 'A'), (cost = 4)));
-      C.AddNeighbor(new Node((name = 'B'), (cost = 1)));
-      C.AddNeighbor(new Node((name = 'D'), (cost = 4)));
-      Grafo.push(C);
-
-      let D = new Node((name = 'D'));
-      D.AddNeighbor(new Node((name = 'C'), (cost = 4)));
-      D.AddNeighbor(new Node((name = 'B'), (cost = 6)));
-      D.AddNeighbor(new Node((name = 'E'), (cost = 2)));
-      Grafo.push(D);
-
-      let E = new Node((name = 'E'));
-      E.AddNeighbor(new Node((name = 'B'), (cost = 9)));
-      E.AddNeighbor(new Node((name = 'D'), (cost = 2)));
-      Grafo.push(E);
-
-      algoritmoUsado = 3;
-    } else {
-      console.log('Usando Flooding...');
-      algoritmoUsado = 1;
+// ? Se lee el csv con la informacion del grafo
+let GrafoCSV = {};
+fs.createReadStream('grafo.csv')
+  .pipe(csv())
+  .on('data', function (row) {
+    if (GrafoCSV[row.Nodo1] === undefined) {
+      // ! no existe nodo en grafo
+      GrafoCSV[row.Nodo1] = {};
     }
-    rl.close();
-  }
-);
+    GrafoCSV[row.Nodo1][row.Nodo2] = row.Peso;
+  })
+  .on('end', function () {
+    // ! Se termina la lectura del CSV
+    console.log(GrafoCSV);
+    // ? Se define el algoritmo a usar
+    rl.question(
+      'Ingrese que algoritmo usar: \n 1. Flooding \n 2. Distance vector routing \n 3. Link state routing \n >',
+      (algoritmo) => {
+        if (algoritmo == 1) {
+          console.log('Usando Flooding...');
+
+          let A = new Node((name = 'A'));
+          A.AddNeighbor(new Node((name = 'B'), (cost = 1)));
+          A.AddNeighbor(new Node((name = 'C'), (cost = 2)));
+          Grafo.push(A);
+
+          let B = new Node((name = 'B'));
+          B.AddNeighbor(new Node((name = 'A'), (cost = 1)));
+          B.AddNeighbor(new Node((name = 'E'), (cost = 4)));
+          B.AddNeighbor(new Node((name = 'C'), (cost = 3)));
+          B.AddNeighbor(new Node((name = 'D'), (cost = 5)));
+          Grafo.push(B);
+
+          let C = new Node((name = 'C'));
+          C.AddNeighbor(new Node((name = 'A'), (cost = 2)));
+          C.AddNeighbor(new Node((name = 'B'), (cost = 3)));
+          C.AddNeighbor(new Node((name = 'D'), (cost = 6)));
+          Grafo.push(C);
+
+          let D = new Node((name = 'D'));
+          D.AddNeighbor(new Node((name = 'C'), (cost = 6)));
+          D.AddNeighbor(new Node((name = 'B'), (cost = 5)));
+          D.AddNeighbor(new Node((name = 'E'), (cost = 7)));
+          Grafo.push(D);
+
+          let E = new Node((name = 'E'));
+          E.AddNeighbor(new Node((name = 'B'), (cost = 4)));
+          E.AddNeighbor(new Node((name = 'D'), (cost = 7)));
+          Grafo.push(E);
+
+          algoritmoUsado = 1;
+        } else if (algoritmo == 2) {
+          console.log('Usando Distance vector routing...');
+          algoritmoUsado = 2;
+          // dvr = new ServerDvr();
+          dvr = new ServerDVR();
+          clientesDvr = {};
+        } else if (algoritmo == 3) {
+          console.log('Usando Link state routing...');
+          let A = new Node((name = 'A'));
+
+          A.AddNeighbor(new Node((name = 'B'), (cost = 2)));
+          A.AddNeighbor(new Node((name = 'C'), (cost = 4)));
+          A.AddNeighbor(new Node((name = 'D'), (cost = 10)));
+          Grafo.push(A);
+
+          let B = new Node((name = 'B'));
+          B.AddNeighbor(new Node((name = 'A'), (cost = 2)));
+          B.AddNeighbor(new Node((name = 'E'), (cost = 9)));
+          B.AddNeighbor(new Node((name = 'C'), (cost = 1)));
+          B.AddNeighbor(new Node((name = 'D'), (cost = 6)));
+          Grafo.push(B);
+
+          let C = new Node((name = 'C'));
+          C.AddNeighbor(new Node((name = 'A'), (cost = 4)));
+          C.AddNeighbor(new Node((name = 'B'), (cost = 1)));
+          C.AddNeighbor(new Node((name = 'D'), (cost = 4)));
+          Grafo.push(C);
+
+          let D = new Node((name = 'D'));
+          D.AddNeighbor(new Node((name = 'C'), (cost = 4)));
+          D.AddNeighbor(new Node((name = 'B'), (cost = 6)));
+          D.AddNeighbor(new Node((name = 'E'), (cost = 2)));
+          Grafo.push(D);
+
+          let E = new Node((name = 'E'));
+          E.AddNeighbor(new Node((name = 'B'), (cost = 9)));
+          E.AddNeighbor(new Node((name = 'D'), (cost = 2)));
+          Grafo.push(E);
+
+          algoritmoUsado = 3;
+        } else {
+          console.log('Usando Flooding...');
+          algoritmoUsado = 1;
+        }
+        rl.close();
+      }
+    );
+    // ? FIN Se define el algoritmo a usar
+  });
 
 //**********************************************************************************************
 //**********************************************************************************************
@@ -121,53 +139,52 @@ let GrafoChico = [];
 //**********************************************************************************************
 //**********************************************************************************************
 // ? Metodos Flooding
-let Grafito=[]
-function HabilitarMensajesFlooding(){
+let Grafito = [];
+function HabilitarMensajesFlooding() {
   NodosActuales['A'].send(
     JSON.stringify({
       option: 2,
-      Grafo: "ahi vamos prrrrro",
+      Grafo: 'ahi vamos prrrrro',
     })
   );
   NodosActuales['B'].send(
     JSON.stringify({
       option: 2,
-      Grafo: "ahi vamos prrrrro",
+      Grafo: 'ahi vamos prrrrro',
     })
   );
   NodosActuales['C'].send(
     JSON.stringify({
       option: 2,
-      Grafo: "ahi vamos prrrrro",
+      Grafo: 'ahi vamos prrrrro',
     })
   );
   NodosActuales['D'].send(
     JSON.stringify({
       option: 2,
-      Grafo: "ahi vamos prrrrro",
+      Grafo: 'ahi vamos prrrrro',
     })
   );
   NodosActuales['E'].send(
     JSON.stringify({
       option: 2,
-      Grafo: "ahi vamos prrrrro",
+      Grafo: 'ahi vamos prrrrro',
     })
   );
-  
 }
 
-function UsarFlooding(mensaje){
+function UsarFlooding(mensaje) {
   let vecinos = GetNeig(mensaje.NodoInicio);
-  console.log("sus vecinos son ", vecinos);
+  console.log('sus vecinos son ', vecinos);
   vecinos.forEach((element) => {
-    if (element != mensaje.NodoPrevio){
+    if (element != mensaje.NodoPrevio) {
       const objeto = {
         option: 6,
         NodoPrevio: mensaje.NodoInicio,
         NodoInicio: element,
         NodoFin: mensaje.NodoFin,
         mensaje: mensaje.mensaje,
-        hopCount: mensaje.hopCount-1,
+        hopCount: mensaje.hopCount - 1,
       };
       NodosActuales[element].send(JSON.stringify(objeto));
     }
@@ -182,14 +199,12 @@ function GetNeig(NodoActual) {
     }
   });
   let vecinitos = nodos_pruebas.neighbors;
-  let nombre_vecinitos=[];
-  vecinitos.forEach((element)=>{
+  let nombre_vecinitos = [];
+  vecinitos.forEach((element) => {
     nombre_vecinitos.push(element.name);
   });
   return nombre_vecinitos;
 }
-
-
 
 //**********************************************************************************************
 //**********************************************************************************************
@@ -286,7 +301,7 @@ function InterpretarMensaje(mensaje, cliente) {
     );
 
     if (Object.keys(NodosActuales).length === 5) {
-      if (algoritmoUsado === 1){
+      if (algoritmoUsado === 1) {
         HabilitarMensajesFlooding();
       }
       // ! Comienza algoritmo para recorrer el grafo
@@ -294,23 +309,20 @@ function InterpretarMensaje(mensaje, cliente) {
         IniciarAlgoritmo('A', 'E');
       }
     }
-  } 
-  else if (mensaje.option === 3) {
+  } else if (mensaje.option === 3) {
     //! Explorar nuevo nodo
 
     if (algoritmoUsado === 3) {
       console.log(mensaje);
       VisitarNuevoNodo(mensaje.nextNodo, mensaje.NodoInicio, mensaje.NodoFin);
     }
-  } 
-  else if (mensaje.option === 4) {
+  } else if (mensaje.option === 4) {
     //! Fin de algoritmo
     if (algoritmoUsado === 3) {
       EnviarGrafo(mensaje);
     }
-  } 
-  else if (mensaje.option === 5) {
-    if (algoritmoUsado === 1){
+  } else if (mensaje.option === 5) {
+    if (algoritmoUsado === 1) {
       UsarFlooding(mensaje);
     }
     //! Enviar mensaje
@@ -322,10 +334,8 @@ function InterpretarMensaje(mensaje, cliente) {
 }
 
 function InterpretarMensajeDvr(mensaje, cliente) {
-
   // nueva conexion
   if (mensaje.option === 1) {
-
     if (Object.keys(clientesDvr).length >= 9) return;
     // dvr brinda nodo disponible
     let nuevoNodo = dvr.NewClientConnected();
@@ -345,15 +355,14 @@ function InterpretarMensajeDvr(mensaje, cliente) {
 
     // Si todos están listos, enviar opción 2
     if (Object.keys(clientesDvr).length === 9) {
-
       var counter = 0;
 
-      const interval = setInterval(function() {
+      const interval = setInterval(function () {
         s.clients.forEach(function each(client) {
           if (client.readyState === CLIENT_READY) {
             client.send(
               JSON.stringify({
-                option: 2
+                option: 2,
               })
             );
           }
@@ -362,13 +371,10 @@ function InterpretarMensajeDvr(mensaje, cliente) {
         counter += 1;
         if (counter > 3) clearInterval(interval);
       }, 200);
-
-
     }
 
     // Enviar routing vector
   } else if (mensaje.option === 2) {
-
     let destName = mensaje.destName;
     let srcName = mensaje.srcName;
     let routingVector = mensaje.routingVector;
@@ -382,11 +388,9 @@ function InterpretarMensajeDvr(mensaje, cliente) {
       JSON.stringify({
         option: 3,
         srcName,
-        routingVector
+        routingVector,
       })
     );
-
-
   }
 }
 
@@ -395,18 +399,17 @@ function InterpretarMensajeDvr(mensaje, cliente) {
 //**********************************************************************************************
 
 // ? Metodos del servidor
-s.on('connection', function(ws) {
-  ws.on('message', function(message) {
+s.on('connection', function (ws) {
+  ws.on('message', function (message) {
     InterpretarMensaje(JSON.parse(message), ws);
     // InterpretarMensajeDvr(JSON.parse(message), ws);
   });
 
-  ws.on('close', function(message) {
+  ws.on('close', function (message) {
     console.log('se cierra un cliente ' + message);
   });
 
   console.log('cliente conectado ');
   console.log(Grafo);
-  
-
+  console.log(GrafoCSV);
 });
