@@ -28,7 +28,8 @@ var dvr;
 var clientesDvr = {};
 // ? Se lee el csv con la informacion del grafo
 let GrafoCSV = {};
-fs.createReadStream('src/Jose/grafo.csv')
+//fs.createReadStream('grafo.csv')
+fs.createReadStream('grafo_lab.csv')
   .pipe(csv())
   .on('data', function (row) {
     if (GrafoCSV[row.Nodo1] === undefined) {
@@ -112,7 +113,6 @@ function UsarFlooding(mensaje) {
         hopCount: mensaje.hopCount - 1,
       };
       NodosActuales[key].send(JSON.stringify(objeto));
-
     }
   }
 }
