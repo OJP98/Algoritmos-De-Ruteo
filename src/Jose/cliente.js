@@ -57,7 +57,7 @@ let saltos;
 function EnviarMensajeFlooding(mensaje) {
   saltos = mensaje.hopCount;
   let distancias = 0;
-  processFork = fork('/src/Jose/getInput.js');
+  processFork = fork('src/Jose/getInput.js');
   processFork.send('servidor');
 
   processFork.on('message', (message) => {
@@ -241,12 +241,14 @@ function InputLibre(mensaje) {
 
     try {
       const ruta = clienteDvr.GetNextNode(message.destino);
+      const rutaCompleta = `${clienteDvr.NodeName}`;
       const objeto = {
         option: 5,
         NodoInicio: clienteDvr.NodeName,
         NodoFin: message.destino,
         mensaje: message.mensaje,
         ruta: ruta.path,
+        rutaCompleta: rutaCompleta,
         distanciaTotal: ruta.cost,
         saltos: 0
       };
@@ -264,13 +266,15 @@ function EvaluarMensaje(mensaje) {
   if (mensaje.NodoFin !== clienteDvr.NodeName) {
 
     let saltosTotales = parseInt(mensaje.saltos) + 1;
-    const ruta = clienteDvr.GetNextNode(mensaje.NodoFin);
+    let ruta = clienteDvr.GetNextNode(mensaje.NodoFin);
+    let rutaCompleta = `${mensaje.rutaCompleta}, ${clienteDvr.NodeName}`;
     const objeto = {
       option: 5,
       NodoInicio: mensaje.NodoInicio,
       NodoFin: mensaje.NodoFin,
       mensaje: mensaje.mensaje,
       ruta: ruta.path,
+      rutaCompleta: rutaCompleta,
       distanciaTotal: mensaje.distanciaTotal,
       saltos: saltosTotales
     }
@@ -289,7 +293,7 @@ function LogMensajeDvr(objeto) {
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
-  Ruta: ${objeto.ruta}
+  Ruta: ${objeto.rutaCompleta}, ${clienteDvr.NodeName}
   Saltos Recorridos: ${objeto.saltos}
   Distancia Total: ${objeto.distanciaTotal}
   Mensaje: ${objeto.mensaje}
@@ -300,7 +304,7 @@ function LogMensajeDvr(objeto) {
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
-  Ruta: ${objeto.ruta}
+  Ruta: ${objeto.rutaCompleta}
   Saltos Recorridos: ${objeto.saltos}
   Distancia Total: ${objeto.distanciaTotal}
   Mensaje: ${objeto.mensaje}
@@ -311,7 +315,7 @@ function LogMensajeDvr(objeto) {
     console.log(`
   Nodo Fuente: ${objeto.NodoInicio}
   Nodo Destino: ${objeto.NodoFin}
-  Ruta: ${objeto.ruta}
+  Ruta: ${objeto.rutaCompleta}
   Saltos Recorridos: ${objeto.saltos}
   Distancia Total: ${objeto.distanciaTotal}
   `);
